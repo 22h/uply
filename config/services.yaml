@@ -70,6 +70,12 @@ services:
         tags:
             - { name: kernel.event_listener, event: uply.monitor.notify, method: onMonitorNotify }
 
+    App\Event\Listener\NotificationLoggingListener:
+        tags:
+            - { name: kernel.event_listener, event: uply.monitor.notify, method: onMonitorNotify }
+        calls:
+            - [setLogger, ['@monolog.logger.uply_unit']]
+
     App\Event\Listener\MonitorFinishedListener:
         arguments:
             - '@App\Repository\EventRepository'

@@ -1,0 +1,9 @@
+monolog:
+    channels: ['monitor', 'monitor_unit', 'uply_unit']
+    handlers:
+        uply_units:
+            level:    debug
+            type:     rotating_file
+            path:     '%kernel.logs_dir%/uply_unit.log'
+            channels: [uply_unit]
+            max_files: 14
