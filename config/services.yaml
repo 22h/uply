@@ -29,6 +29,13 @@ services:
         tags:
             - { name: 'console.command' }
 
+    App\Command\StopCommand:
+        arguments:
+            - '@App\Repository\EventRepository'
+            - '@App\Service\EventFactory'
+        tags:
+            - { name: 'console.command' }
+
     App\Command\CheckLoopCommand:
         tags:
             - { name: 'console.command' }
