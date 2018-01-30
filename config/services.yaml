@@ -1,0 +1,88 @@
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
+parameters:
+    locale: 'en'
+
+services:
+    # default configuration for services in *this* file
+    _defaults:
+        autowire: false      # Automatically injects dependencies in your services.
+        autoconfigure: false # Automatically registers your services as commands, event subscribers, etc.
+        public: false       # Allows optimizing the container by removing unused services; this also means
+
+    # makes classes in src/ available to be used as services
+    # this creates a service per class whose id is the fully-qualified class name
+    App\:
+        resource: '../src/*'
+        exclude: '../src/{Entity,Migrations,Tests}'
+
+    App\Command\MonitorCommand:
+        arguments:
+            - '@App\Monitor\MonitorUnitChain'
+            - '@event_dispatcher'
+        tags:
+            - { name: 'console.command' }
+
+    App\Command\LoopCommand:
+        arguments:
+            - '@App\Repository\EventRepository'
+        tags:
+            - { name: 'console.command' }
+
+    App\Command\CheckLoopCommand:
+        tags:
+            - { name: 'console.command' }
+
+    App\Monitor\MonitorUnitChain:
+
+    App\Monitor\UnitParameterBagFactory:
+
+    App\Repository\Unit\StatusCodeRepository:
+        factory: ['@doctrine.orm.default_entity_manager', getRepository]
+        arguments:
+            - App\Entity\Unit\StatusCode
+
+    App\Repository\Unit\GooglePageSpeedRepository:
+        factory: ['@doctrine.orm.default_entity_manager', getRepository]
+        arguments:
+            - App\Entity\Unit\GooglePageSpeed
+
+    App\Repository\Unit\CertificateExpireRepository:
+        factory: ['@doctrine.orm.default_entity_manager', getRepository]
+        arguments:
+            - App\Entity\Unit\CertificateExpire
+
+    App\Repository\EventRepository:
+        factory: ['@doctrine.orm.default_entity_manager', getRepository]
+        arguments:
+            - App\Entity\Event
+
+    App\Service\CurlRequest:
+
+    App\Service\HttpHeader:
+
+    App\Service\EventFactory:
+
+    App\Event\Listener\NotificationListener:
+        arguments:
+            - '@App\Notification\MailNotification'
+            - '@App\Notification\DiscordNotification'
+        tags:
+            - { name: kernel.event_listener, event: uply.monitor.notify, method: onMonitorNotify }
+
+    App\Event\Listener\MonitorFinishedListener:
+        arguments:
+            - '@App\Repository\EventRepository'
+            - '@App\Service\EventFactory'
+        tags:
+            - { name: kernel.event_listener, event: uply.monitor.finished, method: onMonitorFinished }
+
+    App\Notification\MailNotification:
+        arguments:
+            - '@swiftmailer.mailer'
+            - '%env(MAIL_FROM)%'
+            - '%env(MAIL_TO)%'
+
+    App\Notification\DiscordNotification:
+          arguments:
+              - '%env(DISCORD_WEBHOOK)%'
