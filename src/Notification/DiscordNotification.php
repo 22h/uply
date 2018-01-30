@@ -10,7 +10,7 @@ use App\Service\Discord\WebHookService;
  *
  * @author Magnus Reiß <info@magnus-reiss.de>
  */
-class DiscordNotification
+class DiscordNotification implements NotificationInterface
 {
 
     /**
@@ -29,11 +29,17 @@ class DiscordNotification
     }
 
     /**
-     * @param UnitParameterBag $monitorParameterBag
-     *
-     * @throws \Exception
+     * @return bool
      */
-    public function send(UnitParameterBag $monitorParameterBag)
+    public function isEnabled(): bool
+    {
+        return (!empty($this->webHookUrl));
+    }
+
+    /**
+     * @param UnitParameterBag $monitorParameterBag
+     */
+    public function send(UnitParameterBag $monitorParameterBag): void
     {
         (new WebHookService($this->webHookUrl))->sendByMonitoringParameterBag($monitorParameterBag);
     }

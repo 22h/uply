@@ -9,7 +9,7 @@ use App\Monitor\UnitParameterBag;
  *
  * @author Magnus Reiß <info@magnus-reiss.de>
  */
-class MailNotification
+class MailNotification implements NotificationInterface
 {
     /**
      * @var \Swift_Mailer
@@ -41,9 +41,17 @@ class MailNotification
     }
 
     /**
+     * @return bool
+     */
+    public function isEnabled(): bool
+    {
+        return (!empty($this->mailFrom) && !empty($this->mailTo));
+    }
+
+    /**
      * @param UnitParameterBag $monitorParameterBag
      */
-    public function send(UnitParameterBag $monitorParameterBag)
+    public function send(UnitParameterBag $monitorParameterBag): void
     {
         $title = '[UPLY]['.$monitorParameterBag->getAlert().'] - '.$monitorParameterBag->getMonitor()->getDomain();
 
