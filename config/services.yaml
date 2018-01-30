@@ -22,12 +22,16 @@ services:
             - '@event_dispatcher'
         tags:
             - { name: 'console.command' }
+        calls:
+            - [setLogger, ['@monolog.logger.monitor']]
 
     App\Command\LoopCommand:
         arguments:
             - '@App\Repository\EventRepository'
         tags:
             - { name: 'console.command' }
+        calls:
+            - [setLogger, ['@monolog.logger.monitor']]
 
     App\Command\StopCommand:
         arguments:
@@ -39,6 +43,8 @@ services:
     App\Command\CheckLoopCommand:
         tags:
             - { name: 'console.command' }
+        calls:
+            - [setLogger, ['@monolog.logger.monitor']]
 
     App\Monitor\MonitorUnitChain:
 
