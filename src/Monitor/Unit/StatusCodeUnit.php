@@ -11,11 +11,11 @@ use App\Service\HttpHeader;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
- * StatusCode
+ * StatusCodeUnit
  *
  * @author Magnus Reiß <info@magnus-reiss.de>
  */
-class StatusCodeUnitCheck extends AbstractUnitCheck
+class StatusCodeUnit extends AbstractUnitCheck
 {
 
     /**

@@ -15,7 +15,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  *
  * @author Magnus Reiß <info@magnus-reiss.de>
  */
-class GooglePageSpeedUnitCheck extends AbstractUnitCheck
+class GooglePageSpeedUnit extends AbstractUnitCheck
 {
 
     const STRATEGY_MOBILE  = 'mobile';

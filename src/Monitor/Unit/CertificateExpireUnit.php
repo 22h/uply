@@ -15,7 +15,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  *
  * @author Magnus Reiß <info@magnus-reiss.de>
  */
-class CertificateExpireUnitCheck extends AbstractUnitCheck
+class CertificateExpireUnit extends AbstractUnitCheck
 {
 
     /**

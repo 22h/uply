@@ -1,5 +1,5 @@
 services:
-    App\Monitor\Unit\AbstractBaseUnit:
+    App\Monitor\Unit\AbstractUnitCheck:
         abstract:  true
         public: false
         arguments:
@@ -7,7 +7,7 @@ services:
             - '@event_dispatcher'
 
     App\Monitor\Unit\StatusCodeUnit:
-        parent: App\Monitor\Unit\AbstractBaseUnit
+        parent: App\Monitor\Unit\AbstractUnitCheck
         arguments:
             $repository: '@App\Repository\Unit\StatusCodeRepository'
             $httpHeader: '@App\Service\HttpHeader'
@@ -15,14 +15,14 @@ services:
             - { name: uply.monitor.unit, identifier: status_code }
 
     App\Monitor\Unit\CertificateExpireUnit:
-        parent: App\Monitor\Unit\AbstractBaseUnit
+        parent: App\Monitor\Unit\AbstractUnitCheck
         arguments:
             $repository: '@App\Repository\Unit\CertificateExpireRepository'
         tags:
             - { name: uply.monitor.unit, identifier: certificate_expire }
 
     App\Monitor\Unit\GooglePageSpeedUnit:
-        parent: App\Monitor\Unit\AbstractBaseUnit
+        parent: App\Monitor\Unit\AbstractUnitCheck
         arguments:
             $repository: '@App\Repository\Unit\GooglePageSpeedRepository'
             $curlRequest: '@App\Service\CurlRequest'

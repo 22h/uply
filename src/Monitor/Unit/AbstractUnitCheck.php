@@ -10,7 +10,7 @@ use App\Repository\Unit\AbstractMonitorRepository;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
- * AbstractBaseUnit
+ * AbstractUnitCheck
  *
  * @author Magnus Reiß <info@magnus-reiss.de>
  */
