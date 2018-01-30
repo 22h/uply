@@ -6,6 +6,9 @@ use App\Entity\Unit\UnitInterface;
 use App\Monitor\Event\MonitorFinishedEvent;
 use App\Monitor\MonitorUnitChain;
 use App\Monitor\Unit\UnitCheckInterface;
+use App\Monitor\UnitNotFoundException;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -17,8 +20,11 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  *
  * @author Magnus Reiß <info@magnus-reiss.de>
  */
-class MonitorCommand extends ContainerAwareCommand
+class MonitorCommand extends ContainerAwareCommand implements LoggerAwareInterface
 {
+
+    use LoggerAwareTrait;
+
     /**
      * @var MonitorUnitChain
      */
@@ -58,16 +64,26 @@ class MonitorCommand extends ContainerAwareCommand
      * @param OutputInterface $output
      *
      * @return void
-     * @throws \Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $monitorId = (int)$input->getArgument('id');
         $monitorType = (string)$input->getArgument('type');
 
-        $monitor = $this->unitChain->getMonitorUnit($monitorType);
+        try {
+            $monitor = $this->unitChain->getMonitorUnit($monitorType);
+        } catch (\Exception $exception) {
+            $monitor = null;
+            $this->logger->error('there is no monitoring registered with name '.$monitorType.'.');
+        }
+
         if ($monitor instanceof UnitCheckInterface) {
-            $unit = $monitor->getUnit($monitorId);
+            try {
+                $unit = $monitor->getUnit($monitorId);
+            }catch (UnitNotFoundException $notFoundException) {
+                $this->logger->error('can not find an monitor unit with id: '.$monitorId.' and class '.$monitorType.'.');
+                exit(1);
+            }
             $monitor->handle($unit);
             $this->dispatchedMonitorFinished($unit);
         }

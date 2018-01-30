@@ -15,7 +15,6 @@ class EventRepository extends AbstractRepository
 
     /**
      * @return null|Event
-     * @throws \Doctrine\ORM\NonUniqueResultException
      */
     public function findNextUnit(): ?Event
     {

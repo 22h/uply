@@ -4,6 +4,9 @@ namespace App\Command;
 
 use App\Entity\Event;
 use App\Repository\EventRepository;
+use Doctrine\ORM\ORMException;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -13,8 +16,10 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * @author Magnus Reiß <info@magnus-reiss.de>
  */
-class LoopCommand extends ContainerAwareCommand
+class LoopCommand extends ContainerAwareCommand implements LoggerAwareInterface
 {
+
+    use LoggerAwareTrait;
 
     const COMMAND_NAME = 'monitor:loop';
 
@@ -48,9 +53,6 @@ class LoopCommand extends ContainerAwareCommand
      * @param OutputInterface $output
      *
      * @return int|null|void
-     * @throws \Doctrine\ORM\NonUniqueResultException
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
      */
     protected function execute(InputInterface $input, OutputInterface $output): void
     {
@@ -66,37 +68,28 @@ class LoopCommand extends ContainerAwareCommand
 
     /**
      * @param Event $event
-     *
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
      */
     private function exitEvent(Event $event): void
     {
         if ($event->isExitEvent()) {
-            $this->eventRepository->remove($event);
+            $this->deleteEvent($event);
             exit(0);
         }
     }
 
     /**
      * @param Event $event
-     *
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
      */
     private function sleepEvent(Event $event): void
     {
         if ($event->isSleepEvent()) {
-            $this->eventRepository->remove($event);
+            $this->deleteEvent($event);
             sleep(30);
         }
     }
 
     /**
      * @param Event $event
-     *
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
      */
     private function cycle(Event $event): void
     {
@@ -106,7 +99,22 @@ class LoopCommand extends ContainerAwareCommand
         $unitId = $event->getUnitId();
         $unitType = $event->getUnitIdent();
 
-        $this->eventRepository->remove($event);
+        $this->deleteEvent($event);
         shell_exec('php bin/console monitor:monitor '.$unitId.' '.$unitType.' > /dev/null 2>/dev/null &');
+    }
+
+    /**
+     * @param Event $event
+     */
+    private function deleteEvent(Event $event): void
+    {
+        try {
+            $this->eventRepository->remove($event);
+        } catch (ORMException $exception) {
+            $this->logger->error(
+                'can not delete event with id: 
+                    '.$event->getId().'. '.$exception->getMessage()
+            );
+        }
     }
 }
