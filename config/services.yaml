@@ -70,7 +70,7 @@ services:
         arguments:
             - App\Entity\Event
 
-    App\Service\CurlRequest:
+    App\Service\Curl\CurlRequestFactory:
 
     App\Service\HttpHeader:
 

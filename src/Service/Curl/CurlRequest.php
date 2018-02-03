@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\Curl;
 
 /**
- * Curl
+ * CurlRequest
  *
  * @author Magnus Reiß <info@magnus-reiss.de>
  */

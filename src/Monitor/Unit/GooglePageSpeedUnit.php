@@ -7,7 +7,7 @@ use App\Entity\Unit\UnitInterface;
 use App\Monitor\UnitParameterBag;
 use App\Monitor\UnitParameterBagFactory;
 use App\Repository\Unit\GooglePageSpeedRepository;
-use App\Service\CurlRequest;
+use App\Service\Curl\CurlRequestFactory;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -27,9 +27,9 @@ class GooglePageSpeedUnit extends AbstractUnitCheck
     protected $repository;
 
     /**
-     * @var CurlRequest
+     * @var CurlRequestFactory
      */
-    private $curlRequest;
+    private $curlRequestFactory;
 
     /**
      * @var string
@@ -42,18 +42,18 @@ class GooglePageSpeedUnit extends AbstractUnitCheck
      * @param UnitParameterBagFactory   $parameterBagFactory
      * @param EventDispatcherInterface  $eventDispatcher
      * @param GooglePageSpeedRepository $repository
-     * @param CurlRequest               $curlRequest
+     * @param CurlRequestFactory        $curlRequestFactory
      * @param string                    $apiKey
      */
     public function __construct(
         UnitParameterBagFactory $parameterBagFactory,
         EventDispatcherInterface $eventDispatcher,
         GooglePageSpeedRepository $repository,
-        CurlRequest $curlRequest,
+        CurlRequestFactory $curlRequestFactory,
         string $apiKey
     ) {
         $this->repository = $repository;
-        $this->curlRequest = $curlRequest;
+        $this->curlRequestFactory = $curlRequestFactory;
         $this->apiKey = $apiKey;
 
         parent::__construct($parameterBagFactory, $eventDispatcher);
@@ -165,13 +165,15 @@ class GooglePageSpeedUnit extends AbstractUnitCheck
      */
     private function checkPageSpeed(string $url, string $type): int
     {
+        $curlRequest = $this->curlRequestFactory->createCurlRequest();
+
         $requestUrl = 'https://www.googleapis.com/pagespeedonline/v4/runPagespeed?url='.
             rawurlencode($url).'&strategy='.$type.'&key='.$this->apiKey;
 
-        $this->curlRequest->request($requestUrl);
+        $curlRequest->request($requestUrl);
 
-        if (is_null($this->curlRequest->getErrorCode())) {
-            $response = json_decode($this->curlRequest->getResponse(), 1);
+        if (is_null($curlRequest->getErrorCode())) {
+            $response = json_decode($curlRequest->getResponse(), 1);
 
             if (isset($response['ruleGroups']['SPEED']['score'])) {
                 return (int)$response['ruleGroups']['SPEED']['score'];

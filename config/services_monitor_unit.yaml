@@ -25,7 +25,7 @@ services:
         parent: App\Monitor\Unit\AbstractUnitCheck
         arguments:
             $repository: '@App\Repository\Unit\GooglePageSpeedRepository'
-            $curlRequest: '@App\Service\CurlRequest'
+            $curlRequestFactory: '@App\Service\Curl\CurlRequestFactory'
             $apiKey: '%env(GOOGLE_PAGE_SPEED_KEY)%'
         tags:
             - { name: uply.monitor.unit, identifier: google_page_speed }
