@@ -1,0 +1,18 @@
+uply:
+    monitoring_units:
+        status_code:
+            entity: App\Entity\Unit\StatusCode
+            repository: App\Repository\Unit\StatusCodeRepository
+            service: App\Monitor\Unit\StatusCodeUnit
+            enabled: true
+        google_page_speed:
+            entity: App\Entity\Unit\GooglePageSpeed
+            repository: App\Repository\Unit\GooglePageSpeedRepository
+            service: App\Monitor\Unit\GooglePageSpeedUnit
+            enabled: true
+        certificate_expire:
+            entity: App\Entity\Unit\CertificateExpire
+            repository: App\Repository\Unit\CertificateExpireRepository
+            service: App\Monitor\Unit\CertificateExpireUnit
+            enabled: true
+    notifications:

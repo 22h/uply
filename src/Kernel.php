@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\DependencyInjection\AppExtension;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -52,6 +53,8 @@ class Kernel extends BaseKernel
      */
     protected function configureContainer(ContainerBuilder $container, LoaderInterface $loader)
     {
+
+
         $container->setParameter('container.autowiring.strict_mode', true);
         $container->setParameter('container.dumper.inline_class_loader', true);
         $confDir = $this->getProjectDir().'/config';
@@ -87,6 +90,7 @@ class Kernel extends BaseKernel
     protected function build(ContainerBuilder $container)
     {
         $container->addCompilerPass(new MonitorUnitCompilerPass());
+        $container->registerExtension(new AppExtension());
 
         parent::build($container);
     }
