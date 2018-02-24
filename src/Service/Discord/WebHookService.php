@@ -37,7 +37,7 @@ class WebHookService
     public function sendByMonitoringParameterBag(UnitParameterBag $monitorParameterBag): bool
     {
         $embed = (new Embed())
-            ->setTitle($monitorParameterBag->getMonitor()->getDomain())
+            ->setTitle($monitorParameterBag->getUnit()->getDomain())
             ->setDescription($monitorParameterBag->getMessage())
             ->setFooter((new Embed\Footer())->setText(date('d.m.Y. - H:i:s')));
 

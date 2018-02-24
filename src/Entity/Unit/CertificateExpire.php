@@ -49,7 +49,7 @@ class CertificateExpire extends AbstractUnit
     /**
      * @return string
      */
-    public function getIdent(): string
+    public static function getIdent(): string
     {
         return 'certificate_expire';
     }

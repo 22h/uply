@@ -1,61 +1,46 @@
 <?php
 
-namespace App\Monitor\Unit;
+namespace App\Unit\CertificateExpire;
 
 use App\Entity\Unit\CertificateExpire;
-use App\Entity\Unit\UnitInterface;
+use App\Monitor\Event\NotifyEventDispatcher;
 use App\Monitor\UnitParameterBag;
-use App\Monitor\UnitParameterBagFactory;
-use App\Repository\Unit\CertificateExpireRepository;
+use App\Unit\ScrutinizerInterface;
 use Spatie\SslCertificate\SslCertificate;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
- * CertificateExpireUnit
+ * Scrutinizer
  *
  * @author Magnus Reiß <info@magnus-reiss.de>
  */
-class CertificateExpireUnit extends AbstractUnitCheck
+class Scrutinizer implements ScrutinizerInterface
 {
-
     /**
-     * @var CertificateExpireRepository
+     * @var NotifyEventDispatcher
      */
-    protected $repository;
+    private $notifyEventDispatcher;
 
     /**
-     * CertificateExpireUnit constructor.
+     * Scrutinizer constructor.
      *
-     * @param EventDispatcherInterface    $eventDispatcher
-     * @param UnitParameterBagFactory     $parameterBagFactory
-     * @param CertificateExpireRepository $repository
+     * @param NotifyEventDispatcher $notifyEventDispatcher
      */
-    public function __construct(
-        UnitParameterBagFactory $parameterBagFactory,
-        EventDispatcherInterface $eventDispatcher,
-        CertificateExpireRepository $repository
-    ) {
-        $this->repository = $repository;
-
-        parent::__construct($parameterBagFactory, $eventDispatcher);
+    public function __construct(NotifyEventDispatcher $notifyEventDispatcher)
+    {
+        $this->notifyEventDispatcher = $notifyEventDispatcher;
     }
 
     /**
-     * @param UnitInterface $unit
+     * @param CertificateExpire $unit
      *
      * @throws \Exception
      */
-    public function handle(UnitInterface $unit): void
+    public function scrutinize($unit): void
     {
-        parent::handle($unit);
-        /** @var CertificateExpire $unit */
-
         try {
             $certificate = SslCertificate::createForHostName($unit->getDomain());
-
             $daysLeft = $certificate->expirationDate()->diffInDays();
             $expireSoon = ($unit->getRemindBefore() >= $daysLeft);
-
             if ($certificate->isExpired()) {
                 $this->processingCertificateIsExpired($unit);
             } elseif ($expireSoon) {
@@ -72,7 +57,7 @@ class CertificateExpireUnit extends AbstractUnitCheck
      */
     private function processingError(CertificateExpire $unit, \Exception $exception): void
     {
-        $this->triggerNotification(
+        $this->notifyEventDispatcher->dispatchNotification(
             $unit,
             'Zertifikat defekt',
             'Das SSL Zertifikat auf '.$unit->getDomain().' funktioniert nicht oder wurde falsch eingebunden. '
@@ -86,7 +71,7 @@ class CertificateExpireUnit extends AbstractUnitCheck
      */
     private function processingCertificateIsExpired(CertificateExpire $unit): void
     {
-        $this->triggerNotification(
+        $this->notifyEventDispatcher->dispatchNotification(
             $unit,
             'Zertifikat ausgelaufen',
             'Das SSL Zertifikat auf '.$unit->getDomain().' ist abgelaufen',
@@ -100,7 +85,7 @@ class CertificateExpireUnit extends AbstractUnitCheck
      */
     private function processingExpireSoon(CertificateExpire $unit, int $daysLeft): void
     {
-        $this->triggerNotification(
+        $this->notifyEventDispatcher->dispatchNotification(
             $unit,
             'Zertifikat läuft ab',
             'Das SSL Zertifikat auf '.$unit->getDomain().' läuft in '.$daysLeft.' Tage(n) aus.',
@@ -108,11 +93,4 @@ class CertificateExpireUnit extends AbstractUnitCheck
         );
     }
 
-    /**
-     * @return string
-     */
-    public function entityClass(): string
-    {
-        return CertificateExpire::class;
-    }
 }

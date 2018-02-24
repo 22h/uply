@@ -1,25 +1,36 @@
 services:
-    App\Monitor\Unit\AbstractUnitCheck:
-        abstract:  false
-        public: true
+    App\Unit\StatusCodeService:
         arguments:
-            - '@App\Monitor\UnitParameterBagFactory'
-            - '@event_dispatcher'
+            - '@App\Repository\Unit\StatusCodeRepository'
+            - '@App\Unit\StatusCode\Scrutinizer'
+        tags:
+            - { name: uply.unit.service, identifier: status_code }
 
-    App\Monitor\Unit\StatusCodeUnit:
-        parent: App\Monitor\Unit\AbstractUnitCheck
+    App\Unit\StatusCode\Scrutinizer:
         arguments:
-            $repository: '@App\Repository\Unit\StatusCodeRepository'
-            $httpHeader: '@App\Service\HttpHeader'
+            - '@App\Monitor\Event\NotifyEventDispatcher'
+            - '@App\Service\HttpHeader'
 
-    App\Monitor\Unit\CertificateExpireUnit:
-        parent: App\Monitor\Unit\AbstractUnitCheck
+    App\Unit\CertificateExpireService:
         arguments:
-            $repository: '@App\Repository\Unit\CertificateExpireRepository'
+            - '@App\Repository\Unit\CertificateExpireRepository'
+            - '@App\Unit\CertificateExpire\Scrutinizer'
+        tags:
+            - { name: uply.unit.service, identifier: certificate_expire }
 
-    App\Monitor\Unit\GooglePageSpeedUnit:
-        parent: App\Monitor\Unit\AbstractUnitCheck
+    App\Unit\CertificateExpire\Scrutinizer:
         arguments:
-            $repository: '@App\Repository\Unit\GooglePageSpeedRepository'
-            $curlRequestFactory: '@App\Service\Curl\CurlRequestFactory'
-            $apiKey: '%env(GOOGLE_PAGE_SPEED_KEY)%'
+            - '@App\Monitor\Event\NotifyEventDispatcher'
+
+    App\Unit\GooglePageSpeedService:
+        arguments:
+            - '@App\Repository\Unit\GooglePageSpeedRepository'
+            - '@App\Unit\GooglePageSpeed\Scrutinizer'
+        tags:
+            - { name: uply.unit.service, identifier: google_page_speed }
+
+    App\Unit\GooglePageSpeed\Scrutinizer:
+        arguments:
+            - '@App\Monitor\Event\NotifyEventDispatcher'
+            - '@App\Service\Curl\CurlRequestFactory'
+            - '%env(GOOGLE_PAGE_SPEED_KEY)%'

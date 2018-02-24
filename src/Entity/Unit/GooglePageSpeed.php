@@ -75,7 +75,7 @@ class GooglePageSpeed extends AbstractUnit
     /**
      * @return string
      */
-    public function getIdent(): string
+    public static function getIdent(): string
     {
         return 'google_page_speed';
     }

@@ -2,13 +2,12 @@
 
 namespace App;
 
-use App\DependencyInjection\AppExtension;
+use App\DependencyInjection\Compiler\UnitServiceCompilerPass;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 use Symfony\Component\Routing\RouteCollectionBuilder;
-use App\DependencyInjection\Compiler\MonitorUnitCompilerPass;
 
 class Kernel extends BaseKernel
 {
@@ -53,8 +52,6 @@ class Kernel extends BaseKernel
      */
     protected function configureContainer(ContainerBuilder $container, LoaderInterface $loader)
     {
-
-
         $container->setParameter('container.autowiring.strict_mode', true);
         $container->setParameter('container.dumper.inline_class_loader', true);
         $confDir = $this->getProjectDir().'/config';
@@ -89,8 +86,7 @@ class Kernel extends BaseKernel
      */
     protected function build(ContainerBuilder $container)
     {
-        $container->addCompilerPass(new MonitorUnitCompilerPass());
-        $container->registerExtension(new AppExtension());
+        $container->addCompilerPass(new UnitServiceCompilerPass());
 
         parent::build($container);
     }

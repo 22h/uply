@@ -4,9 +4,7 @@ namespace App\Command;
 
 use App\Entity\Unit\UnitInterface;
 use App\Monitor\Event\MonitorFinishedEvent;
-use App\Monitor\MonitorUnitChain;
-use App\Monitor\Unit\UnitCheckInterface;
-use App\Monitor\UnitNotFoundException;
+use App\Monitor\UnitServiceChain;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -26,7 +24,7 @@ class MonitorCommand extends ContainerAwareCommand implements LoggerAwareInterfa
     use LoggerAwareTrait;
 
     /**
-     * @var MonitorUnitChain
+     * @var UnitServiceChain
      */
     private $unitChain;
 
@@ -38,10 +36,10 @@ class MonitorCommand extends ContainerAwareCommand implements LoggerAwareInterfa
     /**
      * MonitorCommand constructor.
      *
-     * @param MonitorUnitChain         $unitChain
+     * @param UnitServiceChain         $unitChain
      * @param EventDispatcherInterface $eventDispatcher
      */
-    public function __construct(MonitorUnitChain $unitChain, EventDispatcherInterface $eventDispatcher)
+    public function __construct(UnitServiceChain $unitChain, EventDispatcherInterface $eventDispatcher)
     {
         $this->unitChain = $unitChain;
         $this->eventDispatcher = $eventDispatcher;
@@ -67,29 +65,19 @@ class MonitorCommand extends ContainerAwareCommand implements LoggerAwareInterfa
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $monitorId = (int)$input->getArgument('id');
-        $monitorType = (string)$input->getArgument('type');
+        $unitId = (int)$input->getArgument('id');
+        $unitIdent = (string)$input->getArgument('type');
 
         try {
-            $monitor = $this->unitChain->getMonitoringClassByIdent($monitorType);
-            $monitor = $this->getContainer()->get($monitor);
+            $monitor = $this->unitChain->getUnitService($unitIdent);
         } catch (\Exception $exception) {
-            $monitor = null;
-            $this->logger->error('there is no monitoring registered with name '.$monitorType.'.');
+            $this->logger->error('there is no monitoring registered with name '.$unitIdent.'.');
+
+            return;
         }
 
-        if ($monitor instanceof UnitCheckInterface) {
-            try {
-                $unit = $monitor->getUnit($monitorId);
-            } catch (UnitNotFoundException $notFoundException) {
-                $this->logger->error(
-                    'can not find an monitor unit with id: '.$monitorId.' and class '.$monitorType.'.'
-                );
-                exit(1);
-            }
-            $monitor->handle($unit);
-            $this->dispatchedMonitorFinished($unit);
-        }
+        $unit = $monitor->scrutinize($unitId);
+        $this->dispatchedMonitorFinished($unit);
     }
 
     /**

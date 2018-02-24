@@ -18,12 +18,21 @@ services:
 
     App\Command\MonitorCommand:
         arguments:
-            - '@App\Monitor\MonitorUnitChain'
+            - '@App\Monitor\UnitServiceChain'
             - '@event_dispatcher'
         tags:
             - { name: 'console.command' }
         calls:
             - [setLogger, ['@monolog.logger.monitor']]
+
+    App\Command\Monitor\StatusCodeCommand:
+        arguments:
+            - '@App\Service\HttpHeader'
+            - '@App\Repository\Unit\StatusCodeRepository'
+            - '@App\Service\EventFactory'
+            - '@App\Service\EventService'
+        tags:
+            - { name: 'console.command' }
 
     App\Command\LoopCommand:
         tags:
@@ -56,6 +65,12 @@ services:
         tags:
             - { name: 'console.command' }
 
+    App\Command\Loop\StopCommand:
+        arguments:
+            - '@App\Service\MonitoringLoopService'
+        tags:
+            - { name: 'console.command' }
+
     App\Command\Loop\StartCommand:
         arguments:
             - '@App\Service\MonitoringLoopService'
@@ -64,19 +79,36 @@ services:
         calls:
             - [setLogger, ['@monolog.logger.monitor']]
 
+    App\Command\Loop\SyncCommand:
+        arguments:
+            - '@App\Service\EventService'
+            - '@App\Service\MonitoringLoopService'
+        tags:
+            - { name: 'console.command' }
+
     App\Monitor\UnitParameterBagFactory:
 
+    App\Monitor\Event\NotifyEventDispatcher:
+        arguments:
+            - '@App\Monitor\UnitParameterBagFactory'
+            - '@Symfony\Component\EventDispatcher\EventDispatcherInterface'
+
+    App\Monitor\UnitServiceChain:
+
     App\Repository\Unit\StatusCodeRepository:
+        public: true
         factory: ['@doctrine.orm.default_entity_manager', getRepository]
         arguments:
             - App\Entity\Unit\StatusCode
 
     App\Repository\Unit\GooglePageSpeedRepository:
+        public: true
         factory: ['@doctrine.orm.default_entity_manager', getRepository]
         arguments:
             - App\Entity\Unit\GooglePageSpeed
 
     App\Repository\Unit\CertificateExpireRepository:
+        public: true
         factory: ['@doctrine.orm.default_entity_manager', getRepository]
         arguments:
             - App\Entity\Unit\CertificateExpire
@@ -97,6 +129,8 @@ services:
         arguments:
             - '@App\Repository\EventRepository'
             - '@App\Service\EventFactory'
+            - '@App\Monitor\UnitServiceChain'
+            - '@Symfony\Component\DependencyInjection\ContainerInterface'
 
     App\Service\MonitoringLoopService:
         arguments:

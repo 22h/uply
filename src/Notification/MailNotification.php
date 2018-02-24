@@ -53,7 +53,7 @@ class MailNotification implements NotificationInterface
      */
     public function send(UnitParameterBag $monitorParameterBag): void
     {
-        $title = '[UPLY]['.$monitorParameterBag->getAlert().'] - '.$monitorParameterBag->getMonitor()->getDomain();
+        $title = '[UPLY]['.$monitorParameterBag->getAlert().'] - '.$monitorParameterBag->getUnit()->getDomain();
 
         $message = (new \Swift_Message($title))
             ->setFrom($this->mailFrom)

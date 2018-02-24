@@ -50,13 +50,28 @@ class MonitoringLoopService
     }
 
     /**
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    public function addExitEvent(): void
+    {
+        $event = $this->eventFactory->buildEvent(
+            (new \DateTime('2000-01-01')),
+            0,
+            Event::UNIT_SPECIAL_TYPE_EXIT
+        );
+
+        $this->eventService->storeEvent($event);
+    }
+
+    /**
      * @throws \Exception
      */
     public function removeSleepEvent(): void
     {
         $affectedRows = $this->eventService->deleteByUnitTypeAndId(0, Event::UNIT_SPECIAL_TYPE_SLEEP);
 
-        if($affectedRows < 1) {
+        if ($affectedRows < 1) {
             throw new \Exception('The event cannot be deleted because there is none.');
         }
     }
@@ -66,20 +81,14 @@ class MonitoringLoopService
      */
     public function isLoopProcessRunning(): bool
     {
-        $lines = [];
+        $command = 'ps -ef | grep -c "bin/console '.LoopCommand::COMMAND_NAME.'"';
 
-        exec('ps -ef | grep "bin/console '.LoopCommand::COMMAND_NAME.'"', $lines);
-
-        $count = 0;
-        foreach ($lines as $line) {
-            if (strpos($line, 'php bin/console '.LoopCommand::COMMAND_NAME) !== false) {
-                $count++;
-            }
-        }
-
-        return ($count > 1);
+        return ((int)exec($command) > 1);
     }
 
+    /**
+     * @return void
+     */
     public function startLoopProcessNow(): void
     {
         shell_exec('php bin/console '.LoopCommand::COMMAND_NAME.' > /dev/null 2>/dev/null &');

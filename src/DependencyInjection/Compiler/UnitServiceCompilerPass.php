@@ -2,21 +2,21 @@
 
 namespace App\DependencyInjection\Compiler;
 
-use App\Monitor\MonitorUnitChain;
+use App\Monitor\UnitServiceChain;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * MonitorUnitCompilerPass
+ * UnitServiceCompilerPass
  *
  * @author Magnus Reiß <info@magnus-reiss.de>
  */
-class MonitorUnitCompilerPass implements CompilerPassInterface
+class UnitServiceCompilerPass implements CompilerPassInterface
 {
-    const SERVICE_TAG_NAME     = 'uply.monitor.unit';
-    const CHAIN_SERVICE_ID     = MonitorUnitChain::class;
-    const METHOD_ADD_TO_CHAIN  = 'addMonitorUnit';
+    const SERVICE_TAG_NAME     = 'uply.unit.service';
+    const CHAIN_SERVICE_ID     = UnitServiceChain::class;
+    const METHOD_ADD_TO_CHAIN  = 'addUnitService';
     const ATTRIBUTE_IDENTIFIER = 'identifier';
 
     /**

@@ -2,35 +2,42 @@
 
 namespace App\Command\Loop;
 
+use App\Service\EventService;
 use App\Service\MonitoringLoopService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
- * ContinueCommand
+ * SyncCommand
  *
  * @author Magnus Reiß <info@magnus-reiss.de>
  */
-class ContinueCommand extends ContainerAwareCommand
+class SyncCommand extends ContainerAwareCommand
 {
 
-    const COMMAND_NAME = 'monitor:loop:continue';
+    const COMMAND_NAME = 'monitor:loop:sync';
+
+    /**
+     * @var EventService
+     */
+    private $eventService;
 
     /**
      * @var MonitoringLoopService
      */
-    private $monitoringLoopService;
+    private $loopService;
 
     /**
-     * ContinueCommand constructor.
+     * SyncCommand constructor.
      *
-     * @param MonitoringLoopService $eventService
+     * @param EventService          $eventService
+     * @param MonitoringLoopService $loopService
      */
-    public function __construct(MonitoringLoopService $eventService)
+    public function __construct(EventService $eventService, MonitoringLoopService $loopService)
     {
-        $this->monitoringLoopService = $eventService;
+        $this->eventService = $eventService;
+        $this->loopService = $loopService;
 
         parent::__construct();
     }
@@ -48,16 +55,12 @@ class ContinueCommand extends ContainerAwareCommand
      * @param OutputInterface $output
      *
      * @return int|null|void
+     * @throws \Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output): void
     {
-        $symfonyStyle = new SymfonyStyle($input, $output);
-
-        try {
-            $this->monitoringLoopService->removeSleepEvent();
-            $symfonyStyle->success('loop is continue now');
-        } catch (\Exception $exception) {
-            $symfonyStyle->note('loop already running, no sleep event found');
-        }
+        $this->loopService->addSleepEvent();
+        $this->eventService->syncUnitsInEvents($output);
+        $this->loopService->removeSleepEvent();
     }
 }

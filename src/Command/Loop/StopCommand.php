@@ -3,20 +3,23 @@
 namespace App\Command\Loop;
 
 use App\Service\MonitoringLoopService;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
- * StatusCommand
+ * StopCommand
  *
  * @author Magnus Reiß <info@magnus-reiss.de>
  */
-class StatusCommand extends ContainerAwareCommand
+class StopCommand extends ContainerAwareCommand implements LoggerAwareInterface
 {
+    use LoggerAwareTrait;
 
-    const COMMAND_NAME = 'monitor:loop:status';
+    const COMMAND_NAME = 'monitor:loop:stop';
 
     /**
      * @var MonitoringLoopService
@@ -24,7 +27,7 @@ class StatusCommand extends ContainerAwareCommand
     private $monitoringLoopService;
 
     /**
-     * StatusCommand constructor.
+     * StopCommand constructor.
      *
      * @param MonitoringLoopService $eventService
      */
@@ -48,15 +51,19 @@ class StatusCommand extends ContainerAwareCommand
      * @param OutputInterface $output
      *
      * @return int|null|void
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $symfonyStyle = new SymfonyStyle($input, $output);
 
-        if (!$this->monitoringLoopService->isLoopProcessRunning()) {
-            $symfonyStyle->warning('loop is inactive');
+        if ($this->monitoringLoopService->isLoopProcessRunning()) {
+            $symfonyStyle->success('Stop loop now. If you have set up a cron job, the loop will restart immediately.');
+
+            $this->monitoringLoopService->addExitEvent();
         } else {
-            $symfonyStyle->success('loop is already running');
+            $symfonyStyle->warning('Loop is already stopped');
         }
     }
 }

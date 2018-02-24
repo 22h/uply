@@ -25,13 +25,13 @@ class SleepCommand extends ContainerAwareCommand
     private $monitoringLoopService;
 
     /**
-     * StopCommand constructor.
+     * SleepCommand constructor.
      *
-     * @param MonitoringLoopService $monitoringLoopService
+     * @param MonitoringLoopService $eventService
      */
-    public function __construct(MonitoringLoopService $monitoringLoopService)
+    public function __construct(MonitoringLoopService $eventService)
     {
-        $this->monitoringLoopService = $monitoringLoopService;
+        $this->monitoringLoopService = $eventService;
 
         parent::__construct();
     }
