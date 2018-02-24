@@ -2,7 +2,7 @@
 
 namespace App\Monitor;
 
-use App\Entity\Unit\AbstractUnit;
+use App\Entity\Unit\UnitInterface;
 
 /**
  * UnitParameterBagFactory
@@ -13,15 +13,15 @@ class UnitParameterBagFactory
 {
 
     /**
-     * @param AbstractUnit $monitor
-     * @param string       $message
-     * @param string       $title
-     * @param null|string  $alert
+     * @param UnitInterface $monitor
+     * @param string        $message
+     * @param string        $title
+     * @param null|string   $alert
      *
      * @return UnitParameterBag
      */
     public function createParameterBag(
-        AbstractUnit $monitor,
+        UnitInterface $monitor,
         string $message,
         string $title,
         ?string $alert = null

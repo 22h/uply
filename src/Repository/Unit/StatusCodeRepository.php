@@ -7,7 +7,7 @@ namespace App\Repository\Unit;
  *
  * @author Magnus Reiß <info@magnus-reiss.de>
  */
-class StatusCodeRepository extends AbstractMonitorRepository
+class StatusCodeRepository extends AbstractUnitRepository
 {
 
 }

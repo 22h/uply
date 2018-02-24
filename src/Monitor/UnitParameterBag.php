@@ -2,7 +2,7 @@
 
 namespace App\Monitor;
 
-use App\Entity\Unit\AbstractUnit;
+use App\Entity\Unit\UnitInterface;
 
 /**
  * MonitorParameterBag
@@ -17,9 +17,9 @@ class UnitParameterBag
     const ALERT_RED    = 'red';
 
     /**
-     * @var AbstractUnit
+     * @var UnitInterface
      */
-    private $monitor;
+    private $unit;
 
     /**
      * @var string
@@ -39,29 +39,29 @@ class UnitParameterBag
     /**
      * MonitorParameterBag constructor.
      *
-     * @param AbstractUnit $monitor
-     * @param string       $message
-     * @param string       $title
-     * @param null|string  $alert
+     * @param UnitInterface $monitor
+     * @param string        $message
+     * @param string        $title
+     * @param null|string   $alert
      */
     public function __construct(
-        AbstractUnit $monitor,
+        UnitInterface $monitor,
         string $message,
         string $title,
         ?string $alert = null
     ) {
-        $this->monitor = $monitor;
+        $this->unit = $monitor;
         $this->message = $message;
         $this->title = $title;
         $this->alert = $alert;
     }
 
     /**
-     * @return AbstractUnit
+     * @return UnitInterface
      */
-    public function getMonitor(): AbstractUnit
+    public function getUnit(): UnitInterface
     {
-        return $this->monitor;
+        return $this->unit;
     }
 
     /**

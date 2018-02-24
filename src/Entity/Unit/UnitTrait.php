@@ -147,6 +147,26 @@ trait UnitTrait
     }
 
     /**
+     * @return UnitInterface
+     */
+    public function trigger(): UnitInterface
+    {
+        $this->triggered = (new \DateTime());
+
+        return $this;
+    }
+
+    /**
+     * @return UnitInterface
+     */
+    public function removeTrigger(): UnitInterface
+    {
+        $this->triggered = null;
+
+        return $this;
+    }
+
+    /**
      * @param \DateTime $triggered
      *
      * @return UnitInterface

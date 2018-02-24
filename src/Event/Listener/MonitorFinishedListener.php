@@ -42,10 +42,10 @@ class MonitorFinishedListener
      */
     public function onMonitorFinished(MonitorFinishedEvent $event): void
     {
-        $monitorUnit = $event->getMonitorUnit();
+        $unit = $event->getMonitorUnit();
 
-        if (!$monitorUnit->isDeactivated()) {
-            $event = $this->factory->buildEventByMonitorUnit($monitorUnit);
+        if (!$unit->isDeactivated()) {
+            $event = $this->factory->buildEventByMonitorUnit($unit);
             $this->repository->save($event);
         }
     }

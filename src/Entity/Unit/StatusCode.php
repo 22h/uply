@@ -77,7 +77,7 @@ class StatusCode extends AbstractUnit
     /**
      * @return string
      */
-    public function getIdent(): string
+    public static function getIdent(): string
     {
         return 'status_code';
     }

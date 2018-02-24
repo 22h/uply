@@ -11,7 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
- * StartLoopCommand
+ * StartCommand
  *
  * @author Magnus Reiß <info@magnus-reiss.de>
  */
@@ -27,13 +27,13 @@ class StartCommand extends ContainerAwareCommand implements LoggerAwareInterface
     private $monitoringLoopService;
 
     /**
-     * CheckLoopCommand constructor.
+     * StartCommand constructor.
      *
-     * @param MonitoringLoopService $monitoringLoopService
+     * @param MonitoringLoopService $eventService
      */
-    public function __construct(MonitoringLoopService $monitoringLoopService)
+    public function __construct(MonitoringLoopService $eventService)
     {
-        $this->monitoringLoopService = $monitoringLoopService;
+        $this->monitoringLoopService = $eventService;
 
         parent::__construct();
     }

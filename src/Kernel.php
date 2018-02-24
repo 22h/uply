@@ -2,12 +2,12 @@
 
 namespace App;
 
+use App\DependencyInjection\Compiler\UnitServiceCompilerPass;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 use Symfony\Component\Routing\RouteCollectionBuilder;
-use App\DependencyInjection\Compiler\MonitorUnitCompilerPass;
 
 class Kernel extends BaseKernel
 {
@@ -86,7 +86,7 @@ class Kernel extends BaseKernel
      */
     protected function build(ContainerBuilder $container)
     {
-        $container->addCompilerPass(new MonitorUnitCompilerPass());
+        $container->addCompilerPass(new UnitServiceCompilerPass());
 
         parent::build($container);
     }

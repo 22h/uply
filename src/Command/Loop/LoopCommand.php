@@ -61,13 +61,15 @@ class LoopCommand extends ContainerAwareCommand implements LoggerAwareInterface
      * @param OutputInterface $output
      *
      * @return int|null|void
+     * @throws \Doctrine\ORM\NonUniqueResultException
      */
     protected function execute(InputInterface $input, OutputInterface $output): void
     {
         $symfonyStyle = new SymfonyStyle($input, $output);
 
-        if($this->monitoringLoopService->isLoopProcessRunning()) {
+        if ($this->monitoringLoopService->isLoopProcessRunning()) {
             $symfonyStyle->success('loop is already running');
+
             return;
         }
 
@@ -76,7 +78,7 @@ class LoopCommand extends ContainerAwareCommand implements LoggerAwareInterface
 
             if ($event instanceof Event) {
                 $this->cycle($event);
-            }else {
+            } else {
                 sleep(1);
             }
         }
@@ -85,19 +87,17 @@ class LoopCommand extends ContainerAwareCommand implements LoggerAwareInterface
     /**
      * @param Event $event
      */
-    private function checkSleepEvent(Event $event): void
+    private function cycle(Event $event): void
     {
         if ($event->isSleepEvent()) {
             sleep(10);
-        }
-    }
 
-    /**
-     * @param Event $event
-     */
-    private function cycle(Event $event): void
-    {
-        $this->checkSleepEvent($event);
+            return;
+        }
+        if ($event->isExitEvent()) {
+            $this->removeEvent($event);
+            exit();
+        }
 
         $unitId = $event->getUnitId();
         $unitType = $event->getUnitIdent();

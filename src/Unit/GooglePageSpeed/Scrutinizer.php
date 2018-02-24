@@ -1,30 +1,27 @@
 <?php
 
-namespace App\Monitor\Unit;
+namespace App\Unit\GooglePageSpeed;
 
 use App\Entity\Unit\GooglePageSpeed;
-use App\Entity\Unit\UnitInterface;
+use App\Monitor\Event\NotifyEventDispatcher;
 use App\Monitor\UnitParameterBag;
-use App\Monitor\UnitParameterBagFactory;
-use App\Repository\Unit\GooglePageSpeedRepository;
 use App\Service\Curl\CurlRequestFactory;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use App\Unit\ScrutinizerInterface;
 
 /**
- * GooglePageSpeedUnit
+ * Scrutinizer
  *
  * @author Magnus Reiß <info@magnus-reiss.de>
  */
-class GooglePageSpeedUnit extends AbstractUnitCheck
+class Scrutinizer implements ScrutinizerInterface
 {
-
     const STRATEGY_MOBILE  = 'mobile';
     const STRATEGY_DESKTOP = 'desktop';
 
     /**
-     * @var GooglePageSpeedRepository
+     * @var NotifyEventDispatcher
      */
-    protected $repository;
+    private $notifyEventDispatcher;
 
     /**
      * @var CurlRequestFactory
@@ -37,45 +34,34 @@ class GooglePageSpeedUnit extends AbstractUnitCheck
     private $apiKey;
 
     /**
-     * GooglePageSpeedUnit constructor.
+     * Scrutinizer constructor.
      *
-     * @param UnitParameterBagFactory   $parameterBagFactory
-     * @param EventDispatcherInterface  $eventDispatcher
-     * @param GooglePageSpeedRepository $repository
-     * @param CurlRequestFactory        $curlRequestFactory
-     * @param string                    $apiKey
+     * @param NotifyEventDispatcher $notifyEventDispatcher
+     * @param CurlRequestFactory    $curlRequestFactory
+     * @param string                $apiKey
      */
     public function __construct(
-        UnitParameterBagFactory $parameterBagFactory,
-        EventDispatcherInterface $eventDispatcher,
-        GooglePageSpeedRepository $repository,
+        NotifyEventDispatcher $notifyEventDispatcher,
         CurlRequestFactory $curlRequestFactory,
         string $apiKey
     ) {
-        $this->repository = $repository;
+        $this->notifyEventDispatcher = $notifyEventDispatcher;
         $this->curlRequestFactory = $curlRequestFactory;
         $this->apiKey = $apiKey;
-
-        parent::__construct($parameterBagFactory, $eventDispatcher);
     }
 
     /**
-     * @param UnitInterface $unit
+     * @param GooglePageSpeed $unit
      *
      * @throws \Exception
      */
-    public function handle(UnitInterface $unit): void
+    public function scrutinize($unit): void
     {
-        parent::handle($unit);
-        /** @var GooglePageSpeed $unit */
-
         $currentDesktop = $this->checkPageSpeed($unit->getUrl(), self::STRATEGY_DESKTOP);
         $currentMobile = $this->checkPageSpeed($unit->getUrl(), self::STRATEGY_MOBILE);
-
         $desktopFailed = ($currentDesktop < $unit->getLimitDesktop());
         $mobileFailed = ($currentMobile < $unit->getLimitMobile());
         $somethingFailed = ($desktopFailed || $mobileFailed);
-
         if ($somethingFailed && !$unit->isTriggered()) {
             $this->processSomeLimitFailedAndIsNotTriggeredBefore(
                 $unit,
@@ -104,7 +90,7 @@ class GooglePageSpeedUnit extends AbstractUnitCheck
         int $currentMobile
     ): void {
         if ($desktopFailed && $mobileFailed) {
-            $this->triggerNotification(
+            $this->notifyEventDispatcher->dispatchNotification(
                 $unit,
                 'Der Google Page Speed Desktop und Mobile ist zu niedrig',
                 'Der PageSpeed für Desktop soll min. '.$unit->getLimitDesktop().' betragen und beträgt '
@@ -113,7 +99,7 @@ class GooglePageSpeedUnit extends AbstractUnitCheck
                 UnitParameterBag::ALERT_RED
             );
         } elseif ($desktopFailed) {
-            $this->triggerNotification(
+            $this->notifyEventDispatcher->dispatchNotification(
                 $unit,
                 'Der Google Page Speed Desktop ist zu niedrig',
                 'Der PageSpeed für Desktop soll min. '.$unit->getLimitDesktop().' betragen und beträgt '
@@ -121,7 +107,7 @@ class GooglePageSpeedUnit extends AbstractUnitCheck
                 UnitParameterBag::ALERT_YELLOW
             );
         } elseif ($mobileFailed) {
-            $this->triggerNotification(
+            $this->notifyEventDispatcher->dispatchNotification(
                 $unit,
                 'Der Google Page Speed Mobile ist zu niedrig',
                 'Der PageSpeed für Mobile soll min. '.$unit->getLimitMobile().' betragen und beträgt '
@@ -129,9 +115,8 @@ class GooglePageSpeedUnit extends AbstractUnitCheck
                 UnitParameterBag::ALERT_YELLOW
             );
         }
-
         if ($desktopFailed || $mobileFailed) {
-            $this->repository->setAsTriggered($unit->getId());
+            $unit->trigger();
         }
     }
 
@@ -140,21 +125,13 @@ class GooglePageSpeedUnit extends AbstractUnitCheck
      */
     private function processNoLimitFailedAndAlreadyTriggeredBefore(GooglePageSpeed $unit): void
     {
-        $this->triggerNotification(
+        $this->notifyEventDispatcher->dispatchNotification(
             $unit,
             'Der Google Page Speed ist wieder richtig',
             'Der PageSpeed von ('.$unit->getUrl().') ist wieder hoch genug.',
             UnitParameterBag::ALERT_GREEN
         );
-        $this->repository->removeTriggered($unit->getId());
-    }
-
-    /**
-     * @return string
-     */
-    public function entityClass(): string
-    {
-        return GooglePageSpeed::class;
+        $unit->removeTrigger();
     }
 
     /**
@@ -166,15 +143,11 @@ class GooglePageSpeedUnit extends AbstractUnitCheck
     private function checkPageSpeed(string $url, string $type): int
     {
         $curlRequest = $this->curlRequestFactory->createCurlRequest();
-
         $requestUrl = 'https://www.googleapis.com/pagespeedonline/v4/runPagespeed?url='.
             rawurlencode($url).'&strategy='.$type.'&key='.$this->apiKey;
-
         $curlRequest->request($requestUrl);
-
         if (is_null($curlRequest->getErrorCode())) {
             $response = json_decode($curlRequest->getResponse(), 1);
-
             if (isset($response['ruleGroups']['SPEED']['score'])) {
                 return (int)$response['ruleGroups']['SPEED']['score'];
             }

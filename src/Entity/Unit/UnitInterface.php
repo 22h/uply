@@ -56,6 +56,16 @@ interface UnitInterface
     public function isTriggered(): bool;
 
     /**
+     * @return UnitInterface
+     */
+    public function trigger(): UnitInterface;
+
+    /**
+     * @return UnitInterface
+     */
+    public function removeTrigger(): UnitInterface;
+
+    /**
      * @param \DateTime $triggered
      *
      * @return UnitInterface
@@ -80,7 +90,12 @@ interface UnitInterface
     public function setCreateDate(\DateTime $createDate): self;
 
     /**
+     * @return null|string
+     */
+    public function getDomain(): ?string;
+
+    /**
      * @return string
      */
-    public function getIdent(): string;
+    public static function getIdent(): string;
 }

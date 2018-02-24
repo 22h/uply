@@ -3,7 +3,7 @@
 namespace App\Service;
 
 /**
- * StatusCode
+ * HttpHeader
  *
  * @author Magnus Reiß <info@magnus-reiss.de>
  */

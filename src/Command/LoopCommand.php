@@ -2,12 +2,12 @@
 
 namespace App\Command;
 
-use App\Command\Loop\StatusCommand;
 use App\Command\Loop\ContinueCommand;
 use App\Command\Loop\SleepCommand;
 use App\Command\Loop\StartCommand;
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
+use App\Command\Loop\StatusCommand;
+use App\Command\Loop\StopCommand;
+use App\Command\Loop\SyncCommand;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -18,9 +18,8 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  *
  * @author Magnus Reiß <info@magnus-reiss.de>
  */
-class LoopCommand extends ContainerAwareCommand implements LoggerAwareInterface
+class LoopCommand extends ContainerAwareCommand
 {
-    use LoggerAwareTrait;
 
     const COMMAND_NAME = 'monitor:loop';
 
@@ -46,6 +45,8 @@ class LoopCommand extends ContainerAwareCommand implements LoggerAwareInterface
                 SleepCommand::COMMAND_NAME,
                 StartCommand::COMMAND_NAME,
                 StatusCommand::COMMAND_NAME,
+                StopCommand::COMMAND_NAME,
+                SyncCommand::COMMAND_NAME,
             ]
         );
     }

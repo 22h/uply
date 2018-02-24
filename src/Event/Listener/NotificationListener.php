@@ -37,13 +37,15 @@ class NotificationListener
 
     /**
      * @param MonitorNotifyEvent $event
+     *
+     * @throws \Exception
      */
     public function onMonitorNotify(MonitorNotifyEvent $event): void
     {
-        if($this->mailNotification->isEnabled()) {
+        if ($this->mailNotification->isEnabled()) {
             $this->mailNotification->send($event->getParameterBag());
         }
-        if($this->discordNotification->isEnabled()) {
+        if ($this->discordNotification->isEnabled()) {
             $this->discordNotification->send($event->getParameterBag());
         }
     }

@@ -25,7 +25,7 @@ class NotificationLoggingListener implements LoggerAwareInterface
     {
         $parameterBag = $event->getParameterBag();
 
-        $logMessage = $parameterBag->getMonitor()->getDomain().': '.$parameterBag->getMessage();
+        $logMessage = $parameterBag->getUnit()->getDomain().': '.$parameterBag->getMessage();
 
         switch ($event->getParameterBag()->getAlert()) {
             case UnitParameterBag::ALERT_RED:

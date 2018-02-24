@@ -38,6 +38,8 @@ class DiscordNotification implements NotificationInterface
 
     /**
      * @param UnitParameterBag $monitorParameterBag
+     *
+     * @throws \Exception
      */
     public function send(UnitParameterBag $monitorParameterBag): void
     {

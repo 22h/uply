@@ -15,6 +15,7 @@ class EventRepository extends AbstractRepository
 
     /**
      * @return null|Event
+     * @throws \Doctrine\ORM\NonUniqueResultException
      */
     public function findNextUnit(): ?Event
     {
@@ -24,7 +25,12 @@ class EventRepository extends AbstractRepository
         $qb->setParameter('nextCheck', new \DateTime(), Type::DATETIME);
         $qb->setMaxResults(1);
 
-        return $qb->getQuery()->getOneOrNullResult();
+        $event = $qb->getQuery()->getOneOrNullResult();
+        if ($event instanceof Event) {
+            return $event;
+        }
+
+        return null;
     }
 
     /**
@@ -42,6 +48,27 @@ class EventRepository extends AbstractRepository
         $qb->setParameter('unitId', $unitId, Type::INTEGER);
         $qb->setParameter('unitIdent', $unitIdent, Type::STRING);
         $query = $qb->getQuery();
+
         return (int)$query->execute();
     }
+
+    /**
+     * @param array  $ids
+     * @param string $unitIdent
+     *
+     * @return array
+     */
+    public function findUnitIdsInEventsByUnitIds(array $ids, string $unitIdent): array
+    {
+        $qb = $this->createQueryBuilder('event');
+        $qb->select('event.unitId');
+        $qb->where($qb->expr()->in('event.unitId', ':ids'));
+        $qb->andWhere($qb->expr()->eq('event.unitIdent', ':unitIdent'));
+        $qb->setParameter('unitIdent', $unitIdent);
+        $qb->setParameter('ids', $ids);
+
+        return array_column($qb->getQuery()->getResult(), 'unitId');
+    }
+
+
 }

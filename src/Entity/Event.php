@@ -16,6 +16,7 @@ class Event
 {
 
     const UNIT_SPECIAL_TYPE_SLEEP = 'sleep';
+    const UNIT_SPECIAL_TYPE_EXIT  = 'exit';
 
     /**
      * @var integer

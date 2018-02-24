@@ -7,7 +7,7 @@ namespace App\Repository\Unit;
  *
  * @author Magnus Reiß <info@magnus-reiss.de>
  */
-class GooglePageSpeedRepository extends AbstractMonitorRepository
+class GooglePageSpeedRepository extends AbstractUnitRepository
 {
 
 }
