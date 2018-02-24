@@ -71,7 +71,8 @@ class MonitorCommand extends ContainerAwareCommand implements LoggerAwareInterfa
         $monitorType = (string)$input->getArgument('type');
 
         try {
-            $monitor = $this->unitChain->getMonitorUnit($monitorType);
+            $monitor = $this->unitChain->getMonitoringClassByIdent($monitorType);
+            $monitor = $this->getContainer()->get($monitor);
         } catch (\Exception $exception) {
             $monitor = null;
             $this->logger->error('there is no monitoring registered with name '.$monitorType.'.');
@@ -80,8 +81,10 @@ class MonitorCommand extends ContainerAwareCommand implements LoggerAwareInterfa
         if ($monitor instanceof UnitCheckInterface) {
             try {
                 $unit = $monitor->getUnit($monitorId);
-            }catch (UnitNotFoundException $notFoundException) {
-                $this->logger->error('can not find an monitor unit with id: '.$monitorId.' and class '.$monitorType.'.');
+            } catch (UnitNotFoundException $notFoundException) {
+                $this->logger->error(
+                    'can not find an monitor unit with id: '.$monitorId.' and class '.$monitorType.'.'
+                );
                 exit(1);
             }
             $monitor->handle($unit);

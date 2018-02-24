@@ -26,27 +26,43 @@ services:
             - [setLogger, ['@monolog.logger.monitor']]
 
     App\Command\LoopCommand:
+        tags:
+            - { name: 'console.command' }
+
+    App\Command\Loop\LoopCommand:
         arguments:
-            - '@App\Repository\EventRepository'
+            - '@App\Service\EventService'
+            - '@App\Service\MonitoringLoopService'
         tags:
             - { name: 'console.command' }
         calls:
             - [setLogger, ['@monolog.logger.monitor']]
 
-    App\Command\StopCommand:
+    App\Command\Loop\SleepCommand:
         arguments:
-            - '@App\Repository\EventRepository'
-            - '@App\Service\EventFactory'
+            - '@App\Service\MonitoringLoopService'
         tags:
             - { name: 'console.command' }
 
-    App\Command\CheckLoopCommand:
+    App\Command\Loop\ContinueCommand:
+        arguments:
+            - '@App\Service\MonitoringLoopService'
+        tags:
+            - { name: 'console.command' }
+
+    App\Command\Loop\StatusCommand:
+        arguments:
+            - '@App\Service\MonitoringLoopService'
+        tags:
+            - { name: 'console.command' }
+
+    App\Command\Loop\StartCommand:
+        arguments:
+            - '@App\Service\MonitoringLoopService'
         tags:
             - { name: 'console.command' }
         calls:
             - [setLogger, ['@monolog.logger.monitor']]
-
-    App\Monitor\MonitorUnitChain:
 
     App\Monitor\UnitParameterBagFactory:
 
@@ -75,6 +91,17 @@ services:
     App\Service\HttpHeader:
 
     App\Service\EventFactory:
+
+    App\Service\EventService:
+        public: true
+        arguments:
+            - '@App\Repository\EventRepository'
+            - '@App\Service\EventFactory'
+
+    App\Service\MonitoringLoopService:
+        arguments:
+            - '@App\Service\EventFactory'
+            - '@App\Service\EventService'
 
     App\Event\Listener\NotificationListener:
         arguments:

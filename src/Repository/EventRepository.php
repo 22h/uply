@@ -29,16 +29,19 @@ class EventRepository extends AbstractRepository
 
     /**
      * @param int    $unitId
-     * @param string $unitType
+     * @param string $unitIdent
+     *
+     * @return int
      */
-    public function deleteByUnit(int $unitId, string $unitType)
+    public function deleteByUnitTypeAndId(int $unitId, string $unitIdent): int
     {
         $qb = $this->createQueryBuilder('event');
         $qb->delete();
         $qb->where($qb->expr()->eq('event.unitId', ':unitId'));
-        $qb->andWhere($qb->expr()->eq('event.unitType', ':unitType'));
+        $qb->andWhere($qb->expr()->eq('event.unitIdent', ':unitIdent'));
         $qb->setParameter('unitId', $unitId, Type::INTEGER);
-        $qb->setParameter('unitType', $unitType, Type::STRING);
-        $qb->getQuery()->execute();
+        $qb->setParameter('unitIdent', $unitIdent, Type::STRING);
+        $query = $qb->getQuery();
+        return (int)$query->execute();
     }
 }
