@@ -38,7 +38,8 @@ class WebHookService
     {
         $embed = (new Embed())
             ->setTitle($monitorParameterBag->getMonitor()->getDomain())
-            ->setDescription($monitorParameterBag->getMessage());
+            ->setDescription($monitorParameterBag->getMessage())
+            ->setFooter((new Embed\Footer())->setText(date('d.m.Y. - H:i:s')));
 
         if (!is_null($monitorParameterBag->getAlert())) {
             switch ($monitorParameterBag->getAlert()) {

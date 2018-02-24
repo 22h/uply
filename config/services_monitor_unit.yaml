@@ -1,7 +1,7 @@
 services:
     App\Monitor\Unit\AbstractUnitCheck:
-        abstract:  true
-        public: false
+        abstract:  false
+        public: true
         arguments:
             - '@App\Monitor\UnitParameterBagFactory'
             - '@event_dispatcher'
@@ -11,21 +11,15 @@ services:
         arguments:
             $repository: '@App\Repository\Unit\StatusCodeRepository'
             $httpHeader: '@App\Service\HttpHeader'
-        tags:
-            - { name: uply.monitor.unit, identifier: status_code }
 
     App\Monitor\Unit\CertificateExpireUnit:
         parent: App\Monitor\Unit\AbstractUnitCheck
         arguments:
             $repository: '@App\Repository\Unit\CertificateExpireRepository'
-        tags:
-            - { name: uply.monitor.unit, identifier: certificate_expire }
 
     App\Monitor\Unit\GooglePageSpeedUnit:
         parent: App\Monitor\Unit\AbstractUnitCheck
         arguments:
             $repository: '@App\Repository\Unit\GooglePageSpeedRepository'
-            $curlRequest: '@App\Service\CurlRequest'
+            $curlRequestFactory: '@App\Service\Curl\CurlRequestFactory'
             $apiKey: '%env(GOOGLE_PAGE_SPEED_KEY)%'
-        tags:
-            - { name: uply.monitor.unit, identifier: google_page_speed }

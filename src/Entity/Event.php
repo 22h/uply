@@ -15,7 +15,6 @@ use Doctrine\ORM\Mapping as ORM;
 class Event
 {
 
-    const UNIT_SPECIAL_TYPE_EXIT  = 'exit';
     const UNIT_SPECIAL_TYPE_SLEEP = 'sleep';
 
     /**
