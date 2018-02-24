@@ -1,10 +1,8 @@
 <?php
 
-namespace App\Command;
+namespace App\Command\Loop;
 
-use App\Entity\Event;
-use App\Repository\EventRepository;
-use App\Service\EventFactory;
+use App\Service\MonitoringLoopService;
 use Doctrine\ORM\ORMException;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -12,35 +10,28 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
- * StopCommand
+ * SleepCommand
  *
  * @author Magnus Reiß <info@magnus-reiss.de>
  */
-class StopCommand extends ContainerAwareCommand
+class SleepCommand extends ContainerAwareCommand
 {
 
-    const COMMAND_NAME = 'monitor:stop';
+    const COMMAND_NAME = 'monitor:loop:sleep';
 
     /**
-     * @var EventRepository
+     * @var MonitoringLoopService
      */
-    protected $eventRepository;
-
-    /**
-     * @var EventFactory
-     */
-    private $eventFactory;
+    private $monitoringLoopService;
 
     /**
      * StopCommand constructor.
      *
-     * @param EventRepository $eventRepository
-     * @param EventFactory    $eventFactory
+     * @param MonitoringLoopService $monitoringLoopService
      */
-    public function __construct(EventRepository $eventRepository, EventFactory $eventFactory)
+    public function __construct(MonitoringLoopService $monitoringLoopService)
     {
-        $this->eventRepository = $eventRepository;
-        $this->eventFactory = $eventFactory;
+        $this->monitoringLoopService = $monitoringLoopService;
 
         parent::__construct();
     }
@@ -63,15 +54,9 @@ class StopCommand extends ContainerAwareCommand
     {
         $symfonyStyle = new SymfonyStyle($input, $output);
 
-        $event = $this->eventFactory->buildEvent(
-            (new \DateTime('2000-01-01')),
-            0,
-            Event::UNIT_SPECIAL_TYPE_EXIT
-        );
-
         try {
-            $this->eventRepository->save($event);
-            $symfonyStyle->success('loop is now stopped');
+            $this->monitoringLoopService->addSleepEvent();
+            $symfonyStyle->success('loop is now sleeping, you can restart it over '.ContinueCommand::COMMAND_NAME);
         } catch (ORMException $exception) {
             $symfonyStyle->error('can not create stop/exit event');
         }
