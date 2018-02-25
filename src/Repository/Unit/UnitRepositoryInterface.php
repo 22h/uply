@@ -36,4 +36,14 @@ interface UnitRepositoryInterface
      * @return UnitInterface|null
      */
     public function findUnitById(int $id): ?UnitInterface;
+
+    /**
+     * @return mixed
+     */
+    public function findTriggeredUnits();
+
+    /**
+     * @return int
+     */
+    public function countUnits(): int;
 }
