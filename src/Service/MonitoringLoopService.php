@@ -92,9 +92,18 @@ class MonitoringLoopService
      */
     public function isLoopProcessRunning(): bool
     {
-        $command = 'ps -ef | grep -c "bin/console '.LoopCommand::COMMAND_NAME.'"';
+        $lines = [];
 
-        return ((int)exec($command) > 1);
+        exec('ps -ef | grep "bin/console '.LoopCommand::COMMAND_NAME.'"', $lines);
+
+        $count = 0;
+        foreach ($lines as $line) {
+            if (strpos($line, 'php bin/console '.LoopCommand::COMMAND_NAME) !== false) {
+                $count++;
+            }
+        }
+
+        return ($count > 0);
     }
 
     /**
