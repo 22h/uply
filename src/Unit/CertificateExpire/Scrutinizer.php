@@ -43,11 +43,17 @@ class Scrutinizer implements ScrutinizerInterface
             $expireSoon = ($unit->getRemindBefore() >= $daysLeft);
             if ($certificate->isExpired()) {
                 $this->processingCertificateIsExpired($unit);
+                $unit->trigger();
             } elseif ($expireSoon) {
                 $this->processingExpireSoon($unit, $daysLeft);
+                $unit->trigger();
+            } else {
+                $this->processingCertificateValidAgain($unit);
+                $unit->removeTrigger();
             }
         } catch (\Exception $exception) {
             $this->processingError($unit, $exception);
+            $unit->trigger();
         }
     }
 
@@ -76,6 +82,19 @@ class Scrutinizer implements ScrutinizerInterface
             'Zertifikat ausgelaufen',
             'Das SSL Zertifikat auf '.$unit->getDomain().' ist abgelaufen',
             UnitParameterBag::ALERT_RED
+        );
+    }
+
+    /**
+     * @param CertificateExpire $unit
+     */
+    private function processingCertificateValidAgain(CertificateExpire $unit)
+    {
+        $this->notifyEventDispatcher->dispatchNotification(
+            $unit,
+            'Zertifikat wieder OK',
+            'Das SSL Zertifikat auf '.$unit->getDomain().' ist wieder in Ordnung.',
+            UnitParameterBag::ALERT_GREEN
         );
     }
 

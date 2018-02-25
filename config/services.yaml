@@ -4,11 +4,10 @@ parameters:
     locale: 'en'
 
 services:
-    # default configuration for services in *this* file
     _defaults:
-        autowire: true      # Automatically injects dependencies in your services.
-        autoconfigure: false # Automatically registers your services as commands, event subscribers, etc.
-        public: false       # Allows optimizing the container by removing unused services; this also means
+        autowire: true
+        autoconfigure: false
+        public: false
         bind:
             $apiKey: '%env(UPLY_API_KEY)%'
             $defaultMailFrom: '%env(MAIL_FROM)%'
@@ -26,7 +25,6 @@ services:
             - { name: 'console.command' }
         calls:
             - [setLogger, ['@monolog.logger.monitor']]
-
 
     App\Monitor\UnitParameterBagFactory:
 
