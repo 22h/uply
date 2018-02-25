@@ -1,0 +1,21 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: false
+        public: false
+
+    App\Command\Monitor\StatusCodeCommand:
+        tags:
+            - { name: 'console.command' }
+
+    App\Unit\StatusCodeService:
+        tags:
+            - { name: uply.unit.service, identifier: status_code }
+
+    App\Unit\StatusCode\Scrutinizer:
+
+    App\Repository\Unit\StatusCodeRepository:
+        public: true
+        factory: ['@doctrine.orm.default_entity_manager', getRepository]
+        arguments:
+            - App\Entity\Unit\StatusCode

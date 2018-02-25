@@ -1,0 +1,13 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: false
+        public: false
+
+    App\Serializer\Normalizer\DateTimeNormalizer:
+        tags:
+            - { name: serializer.normalizer }
+
+    App\Serializer\Normalizer\DefaultUnitNormalizer:
+        tags:
+            - { name: serializer.normalizer }

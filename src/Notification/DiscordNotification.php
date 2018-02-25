@@ -21,11 +21,11 @@ class DiscordNotification implements NotificationInterface
     /**
      * DiscordNotification constructor.
      *
-     * @param string $webHookUrl
+     * @param string $defaultDiscordWebHook
      */
-    public function __construct(string $webHookUrl)
+    public function __construct(string $defaultDiscordWebHook)
     {
-        $this->webHookUrl = $webHookUrl;
+        $this->webHookUrl = $defaultDiscordWebHook;
     }
 
     /**

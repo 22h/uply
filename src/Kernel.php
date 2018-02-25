@@ -60,7 +60,7 @@ class Kernel extends BaseKernel
             $loader->load($confDir.'/packages/'.$this->environment.'/**/*'.self::CONFIG_EXTS, 'glob');
         }
         $loader->load($confDir.'/services'.self::CONFIG_EXTS, 'glob');
-        $loader->load($confDir.'/services_monitor_unit'.self::CONFIG_EXTS, 'glob');
+        $loader->load($confDir.'/services/*'.self::CONFIG_EXTS, 'glob');
         $loader->load($confDir.'/services_'.$this->environment.self::CONFIG_EXTS, 'glob');
     }
 

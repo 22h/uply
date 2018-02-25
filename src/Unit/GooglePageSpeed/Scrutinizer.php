@@ -38,16 +38,16 @@ class Scrutinizer implements ScrutinizerInterface
      *
      * @param NotifyEventDispatcher $notifyEventDispatcher
      * @param CurlRequestFactory    $curlRequestFactory
-     * @param string                $apiKey
+     * @param string                $googlePageSpeedApiKey
      */
     public function __construct(
         NotifyEventDispatcher $notifyEventDispatcher,
         CurlRequestFactory $curlRequestFactory,
-        string $apiKey
+        string $googlePageSpeedApiKey
     ) {
         $this->notifyEventDispatcher = $notifyEventDispatcher;
         $this->curlRequestFactory = $curlRequestFactory;
-        $this->apiKey = $apiKey;
+        $this->apiKey = $googlePageSpeedApiKey;
     }
 
     /**
