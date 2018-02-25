@@ -6,11 +6,14 @@ parameters:
 services:
     # default configuration for services in *this* file
     _defaults:
-        autowire: false      # Automatically injects dependencies in your services.
+        autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: false # Automatically registers your services as commands, event subscribers, etc.
         public: false       # Allows optimizing the container by removing unused services; this also means
         bind:
             $apiKey: '%env(UPLY_API_KEY)%'
+            $defaultMailFrom: '%env(MAIL_FROM)%'
+            $defaultMailTo: '%env(MAIL_TO)%'
+            $defaultDiscordWebHook: '%env(DISCORD_WEBHOOK)%'
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
@@ -19,101 +22,17 @@ services:
         exclude: '../src/{Entity,Migrations,Tests}'
 
     App\Command\MonitorCommand:
-        arguments:
-            - '@App\Monitor\UnitServiceChain'
-            - '@event_dispatcher'
         tags:
             - { name: 'console.command' }
         calls:
             - [setLogger, ['@monolog.logger.monitor']]
 
-    App\Command\Monitor\StatusCodeCommand:
-        arguments:
-            - '@App\Service\HttpHeader'
-            - '@App\Repository\Unit\StatusCodeRepository'
-            - '@App\Service\EventFactory'
-            - '@App\Service\EventService'
-        tags:
-            - { name: 'console.command' }
-
-    App\Command\LoopCommand:
-        tags:
-            - { name: 'console.command' }
-
-    App\Command\Loop\LoopCommand:
-        arguments:
-            - '@App\Service\EventService'
-            - '@App\Service\MonitoringLoopService'
-        tags:
-            - { name: 'console.command' }
-        calls:
-            - [setLogger, ['@monolog.logger.monitor']]
-
-    App\Command\Loop\SleepCommand:
-        arguments:
-            - '@App\Service\MonitoringLoopService'
-        tags:
-            - { name: 'console.command' }
-
-    App\Command\Loop\ContinueCommand:
-        arguments:
-            - '@App\Service\MonitoringLoopService'
-        tags:
-            - { name: 'console.command' }
-
-    App\Command\Loop\StatusCommand:
-        arguments:
-            - '@App\Service\MonitoringLoopService'
-        tags:
-            - { name: 'console.command' }
-
-    App\Command\Loop\StopCommand:
-        arguments:
-            - '@App\Service\MonitoringLoopService'
-        tags:
-            - { name: 'console.command' }
-
-    App\Command\Loop\StartCommand:
-        arguments:
-            - '@App\Service\MonitoringLoopService'
-        tags:
-            - { name: 'console.command' }
-        calls:
-            - [setLogger, ['@monolog.logger.monitor']]
-
-    App\Command\Loop\SyncCommand:
-        arguments:
-            - '@App\Service\EventService'
-            - '@App\Service\MonitoringLoopService'
-        tags:
-            - { name: 'console.command' }
 
     App\Monitor\UnitParameterBagFactory:
 
     App\Monitor\Event\NotifyEventDispatcher:
-        arguments:
-            - '@App\Monitor\UnitParameterBagFactory'
-            - '@Symfony\Component\EventDispatcher\EventDispatcherInterface'
 
     App\Monitor\UnitServiceChain:
-
-    App\Repository\Unit\StatusCodeRepository:
-        public: true
-        factory: ['@doctrine.orm.default_entity_manager', getRepository]
-        arguments:
-            - App\Entity\Unit\StatusCode
-
-    App\Repository\Unit\GooglePageSpeedRepository:
-        public: true
-        factory: ['@doctrine.orm.default_entity_manager', getRepository]
-        arguments:
-            - App\Entity\Unit\GooglePageSpeed
-
-    App\Repository\Unit\CertificateExpireRepository:
-        public: true
-        factory: ['@doctrine.orm.default_entity_manager', getRepository]
-        arguments:
-            - App\Entity\Unit\CertificateExpire
 
     App\Repository\EventRepository:
         factory: ['@doctrine.orm.default_entity_manager', getRepository]
@@ -128,56 +47,14 @@ services:
 
     App\Service\EventService:
         public: true
-        arguments:
-            - '@App\Repository\EventRepository'
-            - '@App\Service\EventFactory'
-            - '@App\Monitor\UnitServiceChain'
-            - '@Symfony\Component\DependencyInjection\ContainerInterface'
 
     App\Service\MonitoringLoopService:
-        arguments:
-            - '@App\Service\EventFactory'
-            - '@App\Service\EventService'
-            - '@App\Monitor\UnitServiceChain'
-
-    App\Event\Listener\NotificationListener:
-        arguments:
-            - '@App\Notification\MailNotification'
-            - '@App\Notification\DiscordNotification'
-        tags:
-            - { name: kernel.event_listener, event: uply.monitor.notify, method: onMonitorNotify }
-
-    App\Event\Listener\NotificationLoggingListener:
-        tags:
-            - { name: kernel.event_listener, event: uply.monitor.notify, method: onMonitorNotify }
-        calls:
-            - [setLogger, ['@monolog.logger.uply_unit']]
-
-    App\Event\Listener\MonitorFinishedListener:
-        arguments:
-            - '@App\Repository\EventRepository'
-            - '@App\Service\EventFactory'
-        tags:
-            - { name: kernel.event_listener, event: uply.monitor.finished, method: onMonitorFinished }
 
     App\Notification\MailNotification:
-        arguments:
-            - '@swiftmailer.mailer'
-            - '%env(MAIL_FROM)%'
-            - '%env(MAIL_TO)%'
 
     App\Notification\DiscordNotification:
-        arguments:
-            - '%env(DISCORD_WEBHOOK)%'
 
     App\Controller\StatusController:
         tags:
             - 'controller.service_arguments'
 
-    App\Serializer\Normalizer\DateTimeNormalizer:
-        tags:
-            - { name: serializer.normalizer }
-
-    App\Serializer\Normalizer\DefaultUnitNormalizer:
-        tags:
-            - { name: serializer.normalizer }

@@ -30,14 +30,14 @@ class MailNotification implements NotificationInterface
      * MailNotification constructor.
      *
      * @param \Swift_Mailer $swiftMailer
-     * @param string        $mailFrom
-     * @param string        $mailTo
+     * @param string        $defaultMailFrom
+     * @param string        $defaultMailTo
      */
-    public function __construct(\Swift_Mailer $swiftMailer, string $mailFrom, string $mailTo)
+    public function __construct(\Swift_Mailer $swiftMailer, string $defaultMailFrom, string $defaultMailTo)
     {
         $this->swiftMailer = $swiftMailer;
-        $this->mailFrom = $mailFrom;
-        $this->mailTo = $mailTo;
+        $this->mailFrom = $defaultMailFrom;
+        $this->mailTo = $defaultMailTo;
     }
 
     /**

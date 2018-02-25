@@ -1,0 +1,41 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: false
+        public: false
+
+    App\Command\LoopCommand:
+        tags:
+            - { name: 'console.command' }
+
+    App\Command\Loop\LoopCommand:
+        tags:
+            - { name: 'console.command' }
+        calls:
+            - [setLogger, ['@monolog.logger.monitor']]
+
+    App\Command\Loop\SleepCommand:
+        tags:
+            - { name: 'console.command' }
+
+    App\Command\Loop\ContinueCommand:
+        tags:
+            - { name: 'console.command' }
+
+    App\Command\Loop\StatusCommand:
+        tags:
+            - { name: 'console.command' }
+
+    App\Command\Loop\StopCommand:
+        tags:
+            - { name: 'console.command' }
+
+    App\Command\Loop\StartCommand:
+        tags:
+            - { name: 'console.command' }
+        calls:
+            - [setLogger, ['@monolog.logger.monitor']]
+
+    App\Command\Loop\SyncCommand:
+        tags:
+            - { name: 'console.command' }

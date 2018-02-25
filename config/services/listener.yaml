@@ -1,0 +1,19 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: false
+        public: false
+
+    App\Event\Listener\NotificationListener:
+        tags:
+            - { name: kernel.event_listener, event: uply.monitor.notify, method: onMonitorNotify }
+
+    App\Event\Listener\NotificationLoggingListener:
+        tags:
+            - { name: kernel.event_listener, event: uply.monitor.notify, method: onMonitorNotify }
+        calls:
+            - [setLogger, ['@monolog.logger.uply_unit']]
+
+    App\Event\Listener\MonitorFinishedListener:
+        tags:
+            - { name: kernel.event_listener, event: uply.monitor.finished, method: onMonitorFinished }

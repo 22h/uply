@@ -1,0 +1,17 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: false
+        public: false
+
+    App\Unit\CertificateExpireService:
+        tags:
+            - { name: uply.unit.service, identifier: certificate_expire }
+
+    App\Unit\CertificateExpire\Scrutinizer:
+
+    App\Repository\Unit\CertificateExpireRepository:
+        public: true
+        factory: ['@doctrine.orm.default_entity_manager', getRepository]
+        arguments:
+            - App\Entity\Unit\CertificateExpire
