@@ -9,6 +9,8 @@ services:
         autowire: false      # Automatically injects dependencies in your services.
         autoconfigure: false # Automatically registers your services as commands, event subscribers, etc.
         public: false       # Allows optimizing the container by removing unused services; this also means
+        bind:
+            $apiKey: '%env(UPLY_API_KEY)%'
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
@@ -136,6 +138,7 @@ services:
         arguments:
             - '@App\Service\EventFactory'
             - '@App\Service\EventService'
+            - '@App\Monitor\UnitServiceChain'
 
     App\Event\Listener\NotificationListener:
         arguments:
@@ -164,5 +167,17 @@ services:
             - '%env(MAIL_TO)%'
 
     App\Notification\DiscordNotification:
-          arguments:
-              - '%env(DISCORD_WEBHOOK)%'
+        arguments:
+            - '%env(DISCORD_WEBHOOK)%'
+
+    App\Controller\StatusController:
+        tags:
+            - 'controller.service_arguments'
+
+    App\Serializer\Normalizer\DateTimeNormalizer:
+        tags:
+            - { name: serializer.normalizer }
+
+    App\Serializer\Normalizer\DefaultUnitNormalizer:
+        tags:
+            - { name: serializer.normalizer }

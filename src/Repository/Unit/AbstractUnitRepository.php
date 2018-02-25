@@ -68,10 +68,32 @@ abstract class AbstractUnitRepository extends AbstractRepository implements Unit
     public function findUnitById(int $id): ?UnitInterface
     {
         $object = $this->find($id);
-        if($object instanceof UnitInterface) {
+        if ($object instanceof UnitInterface) {
             return $object;
         }
 
         return null;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function findTriggeredUnits()
+    {
+        $qb = $this->createQueryBuilder('unit');
+        $qb->select()
+            ->where($qb->expr()->isNotNull('unit.triggered'))
+            ->andWhere($qb->expr()->eq('unit.deactivated', 0))
+            ->orderBy('unit.triggered', 'DESC');
+
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * @return int
+     */
+    public function countUnits(): int
+    {
+        return $this->count([]);
     }
 }

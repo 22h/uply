@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Command\Loop\LoopCommand;
 use App\Entity\Event;
+use App\Monitor\UnitServiceChain;
 
 /**
  * MonitoringLoopService
@@ -23,15 +24,25 @@ class MonitoringLoopService
     private $eventService;
 
     /**
+     * @var UnitServiceChain
+     */
+    private $unitServiceChain;
+
+    /**
      * MonitoringLoopService constructor.
      *
-     * @param EventFactory $eventFactory
-     * @param EventService $eventService
+     * @param EventFactory     $eventFactory
+     * @param EventService     $eventService
+     * @param UnitServiceChain $unitServiceChain
      */
-    public function __construct(EventFactory $eventFactory, EventService $eventService)
-    {
+    public function __construct(
+        EventFactory $eventFactory,
+        EventService $eventService,
+        UnitServiceChain $unitServiceChain
+    ) {
         $this->eventFactory = $eventFactory;
         $this->eventService = $eventService;
+        $this->unitServiceChain = $unitServiceChain;
     }
 
     /**
@@ -92,5 +103,67 @@ class MonitoringLoopService
     public function startLoopProcessNow(): void
     {
         shell_exec('php bin/console '.LoopCommand::COMMAND_NAME.' > /dev/null 2>/dev/null &');
+    }
+
+    /**
+     * @return array
+     * @throws \Exception
+     */
+    public function getAllTriggeredUnits(): array
+    {
+        $unitIdentities = $this->unitServiceChain->getIdentifier();
+
+        $output = [];
+
+        foreach ($unitIdentities as $unitIdent) {
+            $output[$unitIdent] = $this->getAllTriggeredUnitsByIdent($unitIdent);
+        }
+
+        return $output;
+    }
+
+    /**
+     * @return array
+     * @throws \Exception
+     */
+    public function countAllUnits(): array
+    {
+        $unitIdentities = $this->unitServiceChain->getIdentifier();
+
+        $output = [];
+
+        foreach ($unitIdentities as $unitIdent) {
+            $output[$unitIdent] = $this->countUnitsByIdent($unitIdent);
+        }
+
+        return $output;
+    }
+
+    /**
+     * @param string $ident
+     *
+     * @return int
+     * @throws \Exception
+     */
+    public function countUnitsByIdent(string $ident): int
+    {
+        $unitService = $this->unitServiceChain->getUnitService($ident);
+        $repository = $unitService->getRepository();
+
+        return $repository->countUnits();
+    }
+
+    /**
+     * @param string $ident
+     *
+     * @return array
+     * @throws \Exception
+     */
+    private function getAllTriggeredUnitsByIdent(string $ident): array
+    {
+        $unitService = $this->unitServiceChain->getUnitService($ident);
+        $repository = $unitService->getRepository();
+
+        return $repository->findTriggeredUnits();
     }
 }
