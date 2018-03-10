@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\Event;
+use App\Entity\Unit\Backup;
 use App\Entity\Unit\UnitInterface;
 
 /**
@@ -20,7 +21,11 @@ class EventFactory
      */
     public function buildEventByMonitorUnit(UnitInterface $unit): Event
     {
-        $nextTime = new \DateTime('+'.$unit->getIdleTime().' minutes');
+        if($unit instanceof Backup) {
+            $nextTime = new \DateTime(date('Y-m-d '.$unit->getInitialTime().':00:00',time() + 86400));
+        }else {
+            $nextTime = new \DateTime('+'.$unit->getIdleTime().' minutes');
+        }
 
         return $this->buildEvent(
             $nextTime,

@@ -47,7 +47,7 @@ class Scrutinizer implements ScrutinizerInterface
             } elseif ($expireSoon) {
                 $this->processingExpireSoon($unit, $daysLeft);
                 $unit->trigger();
-            } else {
+            } elseif($unit->isTriggered()) {
                 $this->processingCertificateValidAgain($unit);
                 $unit->removeTrigger();
             }
