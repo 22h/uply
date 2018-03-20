@@ -41,6 +41,13 @@ trait UnitTrait
     private $idleTime = self::DEFAULT_IDLE_TIME;
 
     /**
+     * @var int
+     *
+     * @ORM\Column(type="integer")
+     */
+    private $triggeredIdleTime = self::DEFAULT_IDLE_TIME;
+
+    /**
      * @var bool
      *
      * @ORM\Column(type="boolean")
@@ -114,6 +121,26 @@ trait UnitTrait
     public function setIdleTime(int $idleTime): UnitInterface
     {
         $this->idleTime = $idleTime;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTriggeredIdleTime(): ?int
+    {
+        return $this->triggeredIdleTime;
+    }
+
+    /**
+     * @param int $triggeredIdleTime
+     *
+     * @return UnitInterface
+     */
+    public function setTriggeredIdleTime(int $triggeredIdleTime): UnitInterface
+    {
+        $this->triggeredIdleTime = $triggeredIdleTime;
 
         return $this;
     }

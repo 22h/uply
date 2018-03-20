@@ -46,6 +46,11 @@ class Scrutinizer implements ScrutinizerInterface
     {
         // todo: bust cache!
         $receivedStatusCode = $this->httpHeader->requestStatusCode($unit->getUrl());
+        if($receivedStatusCode !== $unit->getStatusCode()) {
+            sleep(2);
+            $receivedStatusCode = $this->httpHeader->requestStatusCode($unit->getUrl());
+        }
+
         if ($receivedStatusCode === $unit->getStatusCode()) {
             $this->processStatusCodeIsAsExpected($unit);
         } elseif ($receivedStatusCode >= 100 && $receivedStatusCode <= 999) {

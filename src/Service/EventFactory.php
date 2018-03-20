@@ -23,6 +23,8 @@ class EventFactory
     {
         if($unit instanceof Backup) {
             $nextTime = new \DateTime(date('Y-m-d '.$unit->getInitialTime().':00:00',time() + 86400));
+        }elseif($unit->isTriggered() && $unit->getTriggeredIdleTime() != 0) {
+            $nextTime = new \DateTime('+'.$unit->getTriggeredIdleTime().' minutes');
         }else {
             $nextTime = new \DateTime('+'.$unit->getIdleTime().' minutes');
         }

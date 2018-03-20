@@ -39,6 +39,18 @@ interface UnitInterface
     public function setIdleTime(int $idleTime): self;
 
     /**
+     * @return int
+     */
+    public function getTriggeredIdleTime(): ?int;
+
+    /**
+     * @param int $idleTime
+     *
+     * @return self
+     */
+    public function setTriggeredIdleTime(int $idleTime): self;
+
+    /**
      * @return bool
      */
     public function isDeactivated(): bool;
