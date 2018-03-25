@@ -88,9 +88,11 @@ class MonitoringLoopService
     }
 
     /**
+     * @param int $plus
+     *
      * @return bool
      */
-    public function isLoopProcessRunning(): bool
+    public function isLoopProcessRunning(int $plus = 0): bool
     {
         $lines = [];
 
@@ -103,7 +105,7 @@ class MonitoringLoopService
             }
         }
 
-        return ($count > 0);
+        return ($count > $plus);
     }
 
     /**

@@ -67,7 +67,7 @@ class LoopCommand extends ContainerAwareCommand implements LoggerAwareInterface
     {
         $symfonyStyle = new SymfonyStyle($input, $output);
 
-        if ($this->monitoringLoopService->isLoopProcessRunning()) {
+        if ($this->monitoringLoopService->isLoopProcessRunning(1)) {
             $symfonyStyle->success('loop is already running');
 
             return;
