@@ -51,12 +51,19 @@ class HttpHeader
         if (!is_null($this->userAgent)) {
             $options['http']['user_agent'] = $this->userAgent;
         }
-
         stream_context_set_default($options);
 
-        $headers = get_headers($url);
+        $statusCode = 0;
+        try {
+            $headers = @get_headers($url);
+            if(is_array($headers) && array_key_exists(0, $headers)) {
+                $statusCode = (int)substr($headers[0], 9, 3);
+            }
+        }catch (\Exception $exception) {
+            // do nothing
+        }
 
-        return (int)substr($headers[0], 9, 3);
+        return $statusCode;
     }
 
     /**
