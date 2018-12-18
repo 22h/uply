@@ -1,5 +1,8 @@
 .idea/
 .env
-/public/bundles/
 /var/
 /vendor/
+/data/*
+!/data/.gitkeep
+Makefile.prod
+/build

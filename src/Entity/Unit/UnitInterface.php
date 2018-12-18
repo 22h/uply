@@ -3,7 +3,7 @@
 namespace App\Entity\Unit;
 
 /**
- * UnitInterface
+ * MonitorInterface
  *
  * @author Magnus Reiß <info@magnus-reiss.de>
  */
@@ -39,9 +39,33 @@ interface UnitInterface
     public function setIdleTime(int $idleTime): self;
 
     /**
+     * @return int
+     */
+    public function getTriggeredIdleTime(): ?int;
+
+    /**
+     * @param int $idleTime
+     *
+     * @return self
+     */
+    public function setTriggeredIdleTime(int $idleTime): self;
+
+    /**
      * @return bool
      */
     public function isDeactivated(): bool;
+
+    /**
+     * @return string
+     */
+    public function getActualLevel(): ?string;
+
+    /**
+     * @param string $level
+     *
+     * @return UnitInterface
+     */
+    public function setActualLevel(?string $level): self;
 
     /**
      * @param bool $deactivated
@@ -49,23 +73,6 @@ interface UnitInterface
      * @return self
      */
     public function setDeactivated(bool $deactivated): self;
-
-    /**
-     * @return bool
-     */
-    public function isTriggered(): bool;
-
-    /**
-     * @param \DateTime $triggered
-     *
-     * @return UnitInterface
-     */
-    public function setTriggered(\DateTime $triggered): UnitInterface;
-
-    /**
-     * @return \DateTime|null
-     */
-    public function getTriggered(): ?\DateTime;
 
     /**
      * @return \DateTime
@@ -80,7 +87,12 @@ interface UnitInterface
     public function setCreateDate(\DateTime $createDate): self;
 
     /**
+     * @return null|string
+     */
+    public function getDomain(): ?string;
+
+    /**
      * @return string
      */
-    public function getIdent(): string;
+    public static function getIdent(): string;
 }

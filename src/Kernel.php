@@ -2,12 +2,12 @@
 
 namespace App;
 
+use App\DependencyInjection\Compiler\ScrutinizerCompilerPass;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 use Symfony\Component\Routing\RouteCollectionBuilder;
-use App\DependencyInjection\Compiler\MonitorUnitCompilerPass;
 
 class Kernel extends BaseKernel
 {
@@ -16,7 +16,7 @@ class Kernel extends BaseKernel
     const CONFIG_EXTS = '.{php,xml,yaml,yml}';
 
     /**
-     * @return string
+     * @inheritdoc
      */
     public function getCacheDir()
     {
@@ -24,7 +24,7 @@ class Kernel extends BaseKernel
     }
 
     /**
-     * @return string
+     * @inheritdoc
      */
     public function getLogDir()
     {
@@ -32,7 +32,15 @@ class Kernel extends BaseKernel
     }
 
     /**
-     * @return \Generator|\Symfony\Component\HttpKernel\Bundle\BundleInterface[]
+     * @inheritdoc
+     */
+    public function getProjectDir()
+    {
+        return __DIR__.'/..';
+    }
+
+    /**
+     * @inheritdoc
      */
     public function registerBundles()
     {
@@ -45,10 +53,7 @@ class Kernel extends BaseKernel
     }
 
     /**
-     * @param ContainerBuilder $container
-     * @param LoaderInterface  $loader
-     *
-     * @throws \Exception
+     * @inheritdoc
      */
     protected function configureContainer(ContainerBuilder $container, LoaderInterface $loader)
     {
@@ -60,14 +65,12 @@ class Kernel extends BaseKernel
             $loader->load($confDir.'/packages/'.$this->environment.'/**/*'.self::CONFIG_EXTS, 'glob');
         }
         $loader->load($confDir.'/services'.self::CONFIG_EXTS, 'glob');
-        $loader->load($confDir.'/services_monitor_unit'.self::CONFIG_EXTS, 'glob');
+        $loader->load($confDir.'/services/*'.self::CONFIG_EXTS, 'glob');
         $loader->load($confDir.'/services_'.$this->environment.self::CONFIG_EXTS, 'glob');
     }
 
     /**
-     * @param RouteCollectionBuilder $routes
-     *
-     * @throws \Symfony\Component\Config\Exception\FileLoaderLoadException
+     * @inheritdoc
      */
     protected function configureRoutes(RouteCollectionBuilder $routes)
     {
@@ -82,11 +85,11 @@ class Kernel extends BaseKernel
     }
 
     /**
-     * @param ContainerBuilder $container
+     * @inheritdoc
      */
     protected function build(ContainerBuilder $container)
     {
-        $container->addCompilerPass(new MonitorUnitCompilerPass());
+        $container->addCompilerPass(new ScrutinizerCompilerPass());
 
         parent::build($container);
     }

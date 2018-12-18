@@ -1,107 +1,75 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
-    locale: 'en'
+    locale: 'de'
+    router.request_context.host: '%env(ROUTER_REQUEST_HOST)%'
+    router.request_context.scheme: '%env(ROUTER_REQUEST_SCHEME)%'
 
 services:
-    # default configuration for services in *this* file
     _defaults:
-        autowire: false      # Automatically injects dependencies in your services.
-        autoconfigure: false # Automatically registers your services as commands, event subscribers, etc.
-        public: false       # Allows optimizing the container by removing unused services; this also means
+        autowire: true
+        autoconfigure: false
+        public: false
+        bind:
+            $defaultDiscordWebHook: '%env(DISCORD_WEBHOOK)%'
+            $projectDir: '%kernel.project_dir%'
+            $apiKey: '%env(UPLY_API_KEY)%'
+            $heartbeatFile: '%kernel.project_dir%/data/heartbeat'
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
     App\:
         resource: '../src/*'
-        exclude: '../src/{Entity,Migrations,Tests}'
+        exclude: '../src/{Entity}'
 
-    App\Command\MonitorCommand:
-        arguments:
-            - '@App\Monitor\MonitorUnitChain'
-            - '@event_dispatcher'
+    App\Command\:
+        resource: '../src/Command'
+        tags: ['console.command']
+
+    App\Controller\:
+        resource: '../src/Controller'
+        tags: ['controller.service_arguments']
+
+    App\Command\JobProcessCommand:
         tags:
             - { name: 'console.command' }
         calls:
-            - [setLogger, ['@monolog.logger.monitor']]
+            - [setLogger, ['@monolog.logger']]
 
-    App\Command\LoopCommand:
-        arguments:
-            - '@App\Repository\EventRepository'
+    App\Command\JobLoopCommand:
         tags:
             - { name: 'console.command' }
         calls:
-            - [setLogger, ['@monolog.logger.monitor']]
+            - [setLogger, ['@monolog.logger.loop']]
 
-    App\Command\StopCommand:
+    App\Notification\Event\Listener\SendDiscordNotificationListener:
+        tags:
+            - { name: kernel.event_listener, event: uply.notification.send, method: onNotificationSend }
+
+    App\Repository\JobRepository:
+        factory: ['@doctrine.orm.default_entity_manager', getRepository]
         arguments:
-            - '@App\Repository\EventRepository'
-            - '@App\Service\EventFactory'
-        tags:
-            - { name: 'console.command' }
-
-    App\Command\CheckLoopCommand:
-        tags:
-            - { name: 'console.command' }
-        calls:
-            - [setLogger, ['@monolog.logger.monitor']]
-
-    App\Monitor\MonitorUnitChain:
-
-    App\Monitor\UnitParameterBagFactory:
+            - App\Entity\Job
 
     App\Repository\Unit\StatusCodeRepository:
         factory: ['@doctrine.orm.default_entity_manager', getRepository]
         arguments:
             - App\Entity\Unit\StatusCode
 
-    App\Repository\Unit\GooglePageSpeedRepository:
-        factory: ['@doctrine.orm.default_entity_manager', getRepository]
-        arguments:
-            - App\Entity\Unit\GooglePageSpeed
-
     App\Repository\Unit\CertificateExpireRepository:
         factory: ['@doctrine.orm.default_entity_manager', getRepository]
         arguments:
             - App\Entity\Unit\CertificateExpire
 
-    App\Repository\EventRepository:
+    App\Repository\Unit\ContentHashRepository:
         factory: ['@doctrine.orm.default_entity_manager', getRepository]
         arguments:
-            - App\Entity\Event
+            - App\Entity\Unit\ContentHash
 
-    App\Service\CurlRequest:
-
-    App\Service\HttpHeader:
-
-    App\Service\EventFactory:
-
-    App\Event\Listener\NotificationListener:
-        arguments:
-            - '@App\Notification\MailNotification'
-            - '@App\Notification\DiscordNotification'
+    App\Scrutinizer\Services\:
+        resource: '../src/Scrutinizer/Services/*'
         tags:
-            - { name: kernel.event_listener, event: uply.monitor.notify, method: onMonitorNotify }
-
-    App\Event\Listener\NotificationLoggingListener:
-        tags:
-            - { name: kernel.event_listener, event: uply.monitor.notify, method: onMonitorNotify }
+            - { name: uply.scrutinizer }
         calls:
-            - [setLogger, ['@monolog.logger.uply_unit']]
-
-    App\Event\Listener\MonitorFinishedListener:
-        arguments:
-            - '@App\Repository\EventRepository'
-            - '@App\Service\EventFactory'
-        tags:
-            - { name: kernel.event_listener, event: uply.monitor.finished, method: onMonitorFinished }
-
-    App\Notification\MailNotification:
-        arguments:
-            - '@swiftmailer.mailer'
-            - '%env(MAIL_FROM)%'
-            - '%env(MAIL_TO)%'
-
-    App\Notification\DiscordNotification:
-          arguments:
-              - '%env(DISCORD_WEBHOOK)%'
+            - [setNotificationDataFactory, ['@App\Notification\NotificationDataFactory']]
+            - [setLogger, ['@monolog.logger.scrutinizer']]

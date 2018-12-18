@@ -24,7 +24,7 @@ class AbstractRepository extends EntityRepository
     public function save($entity): void
     {
         $this->getEntityManager()->persist($entity);
-        $this->getEntityManager()->flush();
+        $this->getEntityManager()->flush($entity);
     }
 
     /**
@@ -50,7 +50,7 @@ class AbstractRepository extends EntityRepository
     public function remove($entity)
     {
         $this->getEntityManager()->remove($entity);
-        $this->getEntityManager()->flush();
+        $this->getEntityManager()->flush($entity);
     }
 
 }

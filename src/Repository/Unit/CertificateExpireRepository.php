@@ -3,11 +3,11 @@
 namespace App\Repository\Unit;
 
 /**
- * SSLExpireRepository
+ * CertificateExpireRepository
  *
  * @author Magnus Reiß <info@magnus-reiss.de>
  */
-class CertificateExpireRepository extends AbstractMonitorRepository
+class CertificateExpireRepository extends AbstractUnitRepository
 {
 
 }

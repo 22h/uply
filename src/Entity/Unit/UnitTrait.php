@@ -41,6 +41,13 @@ trait UnitTrait
     private $idleTime = self::DEFAULT_IDLE_TIME;
 
     /**
+     * @var int
+     *
+     * @ORM\Column(type="integer")
+     */
+    private $triggeredIdleTime = self::DEFAULT_IDLE_TIME;
+
+    /**
      * @var bool
      *
      * @ORM\Column(type="boolean")
@@ -48,11 +55,11 @@ trait UnitTrait
     private $deactivated = false;
 
     /**
-     * @var \DateTime
+     * @var string|null
      *
-     * @ORM\Column(type="datetime", nullable=true)
+     * @ORM\Column(type="string", length=10, nullable=true)
      */
-    private $triggered = null;
+    private $actualLevel = null;
 
     /**
      * getId
@@ -119,6 +126,26 @@ trait UnitTrait
     }
 
     /**
+     * @return int
+     */
+    public function getTriggeredIdleTime(): ?int
+    {
+        return $this->triggeredIdleTime;
+    }
+
+    /**
+     * @param int $triggeredIdleTime
+     *
+     * @return UnitInterface
+     */
+    public function setTriggeredIdleTime(int $triggeredIdleTime): UnitInterface
+    {
+        $this->triggeredIdleTime = $triggeredIdleTime;
+
+        return $this;
+    }
+
+    /**
      * @return bool
      */
     public function isDeactivated(): bool
@@ -139,31 +166,23 @@ trait UnitTrait
     }
 
     /**
-     * @return bool
+     * @return string
      */
-    public function isTriggered(): bool
+    public function getActualLevel(): ?string
     {
-        return ($this->triggered instanceof \DateTime);
+        return $this->actualLevel;
     }
 
     /**
-     * @param \DateTime $triggered
+     * @param string $level
      *
      * @return UnitInterface
      */
-    public function setTriggered(\DateTime $triggered): UnitInterface
+    public function setActualLevel(?string $level): UnitInterface
     {
-        $this->triggered = $triggered;
+        $this->actualLevel = $level;
 
         return $this;
-    }
-
-    /**
-     * @return \DateTime|null
-     */
-    public function getTriggered(): ?\DateTime
-    {
-        return $this->triggered;
     }
 
     /**
