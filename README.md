@@ -4,13 +4,33 @@ a simple service for checking online times and ssl certificates
 ## available checks
 
 - status code
-- google page speed
+- content hash
 - ssl certificate expire 
 
-## cronjob
+## supervisord
+Add new entry in `supervisord.conf` (default: `/etc/supervisor/supervisord.conf`) 
 ```
-* * * * * php /path/to/project/bin/console monitor:loop:start
+[program:uply_job_loop]
+command=php /var/www/uply.dev/bin/console job:loop
 ```
+### install supervisord 
+```
+# install
+apt-get install supervisor
+
+# check deamon status
+service supervisor status 
+
+# check program status
+supervisorctl status
+
+# stop it
+supervisorctl stop uply_job_loop
+
+# start it
+supervisorctl start uply_job_loop
+```
+
 ## create new uply unit
 
 ### 1. Entity
@@ -53,26 +73,20 @@ class FooBarRepository extends AbstractMonitorRepository
 ```
 
 ### 3. Scrutinizer
-Add new Uply Unit Scrutinizer in `src/Unit/FooBar/` with `AbstractUnitService`.
+Add new Uply Unit Scrutinizer in `src/Scrutinizer/Services/` with `AbstractScrutinizer`.
 ```php
 /**
  * Scrutinizer
  */
-class Scrutinizer implements ScrutinizerInterface
+class FooBarScrutinizer implements AbstractScrutinizer
 {
-    /**
-     * @var NotifyEventDispatcher
-     */
-    private $notifyEventDispatcher;
 
     /**
-     * Scrutinizer constructor.
-     *
-     * @param NotifyEventDispatcher $notifyEventDispatcher
-     */
-    public function __construct(NotifyEventDispatcher $notifyEventDispatcher)
+      * @param FooBarRepository $repository
+      */
+    public function __construct(FooBarRepository $repository)
     {
-        $this->notifyEventDispatcher = $notifyEventDispatcher;
+            parent::__construct($repository);
     }
 
     /**
@@ -80,43 +94,16 @@ class Scrutinizer implements ScrutinizerInterface
      *
      * @throws \Exception
      */
-    public function scrutinize($unit): void
+    public function scrutinize(UnitInterface $unit): NotificationData
     {
-        // Check something and if it is not as expected, then trigger 
-        // $this->notifyEventDispatcher->dispatchNotification(...); 
-        // unless your unit has already been triggered.
+        // Check something and return a NotificationData Object
+        // return $this->notificationDataFactory->createDangerNotificationData(
+        //     'foo_bar.danger',
+        //     ['%fooBar%' => $fooBar]
+        // );
     }
 }
 ```
 
-### 4. Unit Service
-Add new Uply Unit Service in `src/Unit/` with `UnitServiceInterface`.
-```php
-/**
- * FooBarService
- */
-class FooBarService extends AbstractUnitService
-{
-
-    /**
-     * FooBarService constructor.
-     *
-     * @param FooBarRepository $repository
-     * @param Scrutinizer          $scrutinizer
-     */
-    public function __construct(FooBarRepository $repository, Scrutinizer $scrutinizer)
-    {
-        $this->repository = $repository;
-        $this->scrutinizer = $scrutinizer;
-    }
-
-    /**
-     * @return string
-     */
-    public function getEntityClass(): string
-    {
-        return FooBar::class;
-    }
-}
-```
-
+### 4. Translations
+Add new translations in `translations/notification.[a-z].php`.
