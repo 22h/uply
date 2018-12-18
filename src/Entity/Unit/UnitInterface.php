@@ -3,7 +3,7 @@
 namespace App\Entity\Unit;
 
 /**
- * UnitInterface
+ * MonitorInterface
  *
  * @author Magnus Reiß <info@magnus-reiss.de>
  */
@@ -56,38 +56,23 @@ interface UnitInterface
     public function isDeactivated(): bool;
 
     /**
+     * @return string
+     */
+    public function getActualLevel(): ?string;
+
+    /**
+     * @param string $level
+     *
+     * @return UnitInterface
+     */
+    public function setActualLevel(?string $level): self;
+
+    /**
      * @param bool $deactivated
      *
      * @return self
      */
     public function setDeactivated(bool $deactivated): self;
-
-    /**
-     * @return bool
-     */
-    public function isTriggered(): bool;
-
-    /**
-     * @return UnitInterface
-     */
-    public function trigger(): UnitInterface;
-
-    /**
-     * @return UnitInterface
-     */
-    public function removeTrigger(): UnitInterface;
-
-    /**
-     * @param \DateTime $triggered
-     *
-     * @return UnitInterface
-     */
-    public function setTriggered(\DateTime $triggered): UnitInterface;
-
-    /**
-     * @return \DateTime|null
-     */
-    public function getTriggered(): ?\DateTime;
 
     /**
      * @return \DateTime

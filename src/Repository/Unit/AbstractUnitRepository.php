@@ -3,6 +3,7 @@
 namespace App\Repository\Unit;
 
 use App\Entity\Unit\UnitInterface;
+use App\Notification\NotificationData;
 use App\Repository\AbstractRepository;
 use Doctrine\DBAL\Types\Type;
 
@@ -42,20 +43,24 @@ abstract class AbstractUnitRepository extends AbstractRepository implements Unit
     }
 
     /**
-     * @param int $lastCheckedId
-     * @param int $limit
-     *
-     * @return mixed
+     * @return UnitInterface[]
      */
-    public function getUnitEntriesOrderedById(int $lastCheckedId, int $limit = 10)
+    public function findMissingUnitsInJobQueue(): array
     {
+        $unitIdent = (string)call_user_func($this->getClassName().'::getIdent');
+
+        $qb2 = $this->_em->createQueryBuilder();
+        $qb2->select('j.unitId')
+            ->from('App\Entity\Job', 'j')
+            ->where('j.unitIdent = :unitIdent');
+
         $qb = $this->createQueryBuilder('unit');
         $qb->select()
             ->where($qb->expr()->eq('unit.deactivated', 0))
-            ->andWhere($qb->expr()->gt('unit.id', ':lastCheckedId'))
-            ->orderBy('unit.id', 'ASC')
-            ->setMaxResults($limit)
-            ->setParameter('lastCheckedId', $lastCheckedId);
+            ->andWhere(
+                $qb->expr()->notIn('unit.id', $qb2->getDQL())
+            )
+            ->setParameter('unitIdent', $unitIdent);
 
         return $qb->getQuery()->getResult();
     }
@@ -82,9 +87,10 @@ abstract class AbstractUnitRepository extends AbstractRepository implements Unit
     {
         $qb = $this->createQueryBuilder('unit');
         $qb->select()
-            ->where($qb->expr()->isNotNull('unit.triggered'))
+            ->where($qb->expr()->isNotNull('unit.actualLevel'))
+            ->andWhere($qb->expr()->neq('unit.actualLevel', ':actualLevelSuccess'))
             ->andWhere($qb->expr()->eq('unit.deactivated', 0))
-            ->orderBy('unit.triggered', 'DESC');
+            ->setParameter('actualLevelSuccess', NotificationData::LEVEL_SUCCESS);
 
         return $qb->getQuery()->getResult();
     }

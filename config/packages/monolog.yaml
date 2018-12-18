@@ -1,9 +1,15 @@
 monolog:
-    channels: ['monitor', 'monitor_unit', 'uply_unit']
+    channels: ['scrutinizer', 'loop']
     handlers:
-        uply_units:
+        scrutinizer:
             level:    debug
             type:     rotating_file
-            path:     '%kernel.logs_dir%/uply_unit.log'
-            channels: [uply_unit]
-            max_files: 14
+            path:     '%kernel.logs_dir%/scrutinizer.log'
+            channels: [scrutinizer]
+            max_files: 7
+        loop:
+            level:    debug
+            type:     rotating_file
+            path:     '%kernel.logs_dir%/loop.log'
+            channels: [loop]
+            max_files: 2

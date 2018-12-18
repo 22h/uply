@@ -55,11 +55,11 @@ trait UnitTrait
     private $deactivated = false;
 
     /**
-     * @var \DateTime
+     * @var string|null
      *
-     * @ORM\Column(type="datetime", nullable=true)
+     * @ORM\Column(type="string", length=10, nullable=true)
      */
-    private $triggered = null;
+    private $actualLevel = null;
 
     /**
      * getId
@@ -166,51 +166,23 @@ trait UnitTrait
     }
 
     /**
-     * @return bool
+     * @return string
      */
-    public function isTriggered(): bool
+    public function getActualLevel(): ?string
     {
-        return ($this->triggered instanceof \DateTime);
+        return $this->actualLevel;
     }
 
     /**
-     * @return UnitInterface
-     */
-    public function trigger(): UnitInterface
-    {
-        $this->triggered = (new \DateTime());
-
-        return $this;
-    }
-
-    /**
-     * @return UnitInterface
-     */
-    public function removeTrigger(): UnitInterface
-    {
-        $this->triggered = null;
-
-        return $this;
-    }
-
-    /**
-     * @param \DateTime $triggered
+     * @param string $level
      *
      * @return UnitInterface
      */
-    public function setTriggered(\DateTime $triggered): UnitInterface
+    public function setActualLevel(?string $level): UnitInterface
     {
-        $this->triggered = $triggered;
+        $this->actualLevel = $level;
 
         return $this;
-    }
-
-    /**
-     * @return \DateTime|null
-     */
-    public function getTriggered(): ?\DateTime
-    {
-        return $this->triggered;
     }
 
     /**

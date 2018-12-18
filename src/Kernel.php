@@ -2,7 +2,7 @@
 
 namespace App;
 
-use App\DependencyInjection\Compiler\UnitServiceCompilerPass;
+use App\DependencyInjection\Compiler\ScrutinizerCompilerPass;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -16,7 +16,7 @@ class Kernel extends BaseKernel
     const CONFIG_EXTS = '.{php,xml,yaml,yml}';
 
     /**
-     * @return string
+     * @inheritdoc
      */
     public function getCacheDir()
     {
@@ -24,7 +24,7 @@ class Kernel extends BaseKernel
     }
 
     /**
-     * @return string
+     * @inheritdoc
      */
     public function getLogDir()
     {
@@ -32,7 +32,15 @@ class Kernel extends BaseKernel
     }
 
     /**
-     * @return \Generator|\Symfony\Component\HttpKernel\Bundle\BundleInterface[]
+     * @inheritdoc
+     */
+    public function getProjectDir()
+    {
+        return __DIR__.'/..';
+    }
+
+    /**
+     * @inheritdoc
      */
     public function registerBundles()
     {
@@ -45,10 +53,7 @@ class Kernel extends BaseKernel
     }
 
     /**
-     * @param ContainerBuilder $container
-     * @param LoaderInterface  $loader
-     *
-     * @throws \Exception
+     * @inheritdoc
      */
     protected function configureContainer(ContainerBuilder $container, LoaderInterface $loader)
     {
@@ -65,9 +70,7 @@ class Kernel extends BaseKernel
     }
 
     /**
-     * @param RouteCollectionBuilder $routes
-     *
-     * @throws \Symfony\Component\Config\Exception\FileLoaderLoadException
+     * @inheritdoc
      */
     protected function configureRoutes(RouteCollectionBuilder $routes)
     {
@@ -82,11 +85,11 @@ class Kernel extends BaseKernel
     }
 
     /**
-     * @param ContainerBuilder $container
+     * @inheritdoc
      */
     protected function build(ContainerBuilder $container)
     {
-        $container->addCompilerPass(new UnitServiceCompilerPass());
+        $container->addCompilerPass(new ScrutinizerCompilerPass());
 
         parent::build($container);
     }
