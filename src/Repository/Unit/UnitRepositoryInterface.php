@@ -23,12 +23,9 @@ interface UnitRepositoryInterface
     public function removeTriggered(int $id): void;
 
     /**
-     * @param int $lastCheckedId
-     * @param int $limit
-     *
-     * @return mixed
+     * @return array
      */
-    public function getUnitEntriesOrderedById(int $lastCheckedId, int $limit = 10);
+    public function findMissingUnitsInJobQueue(): array;
 
     /**
      * @param int $id

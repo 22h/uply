@@ -1,0 +1,17 @@
+atlassian-ide-plugin.xml
+.*
+/build
+/phpunit.xml
+/tests
+/excludes-*
+/Makefile*
+/README.md
+/var/cache
+/var/log
+/public/data
+/composer.json
+/composer.lock
+/package.json
+/symfony.lock
+*.dist
+/data/*

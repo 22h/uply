@@ -3,13 +3,12 @@
 namespace App\Service;
 
 /**
- * HttpHeader
+ * StatusCode
  *
  * @author Magnus Reiß <info@magnus-reiss.de>
  */
 class HttpHeader
 {
-
     /**
      * @var int
      */
@@ -18,7 +17,7 @@ class HttpHeader
     /**
      * @var string|null
      */
-    protected $userAgent = 'Uplybot/0.1 (+http://github.com)';
+    protected $userAgent = 'Uplybot/0.2 (+http://github.com)';
 
     /**
      * @var string
@@ -34,6 +33,7 @@ class HttpHeader
      * @param string $url
      *
      * @return int
+     * @throws \Exception
      */
     public function requestStatusCode(string $url): int
     {
@@ -52,15 +52,14 @@ class HttpHeader
             $options['http']['user_agent'] = $this->userAgent;
         }
         stream_context_set_default($options);
+        $statusCode = null;
+        $headers = @get_headers($url);
+        if (is_array($headers) && array_key_exists(0, $headers)) {
+            $statusCode = (int)substr($headers[0], 9, 3);
+        }
 
-        $statusCode = 0;
-        try {
-            $headers = @get_headers($url);
-            if(is_array($headers) && array_key_exists(0, $headers)) {
-                $statusCode = (int)substr($headers[0], 9, 3);
-            }
-        }catch (\Exception $exception) {
-            // do nothing
+        if (is_null($statusCode)) {
+            throw new \Exception('can not read http headers from '.$url);
         }
 
         return $statusCode;

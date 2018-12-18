@@ -1,0 +1,13 @@
+####################################################################################################
+# https://www.gnu.org/software/make/                                                               #
+####################################################################################################
+# rsync credentials
+rsyncUser  = ""
+rsyncShare = ""
+rsyncPass  = ""
+
+host = ""
+rsyncPath = /
+
+rsyncExcludes = --include ".ht*" --exclude-from excludes-prod.txt
+rsyncVendorExcludes =

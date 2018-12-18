@@ -6,6 +6,7 @@
         "ext-iconv": "*",
         "doctrine/annotations": "^1.6",
         "doctrine/doctrine-bundle": "^1.8",
+        "sensio/framework-extra-bundle": "^5.2",
         "sentry/sentry-symfony": "^2.0",
         "spatie/ssl-certificate": "^1.12",
         "symfony/console": "^4.0",

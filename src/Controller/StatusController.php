@@ -2,8 +2,7 @@
 
 namespace App\Controller;
 
-use App\Monitor\UnitServiceChain;
-use App\Service\MonitoringLoopService;
+use App\Service\StatusService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -37,32 +36,25 @@ class StatusController extends AbstractController
     /**
      * @Route("/", name="status")
      *
-     * @param Request $request
-     * @param MonitoringLoopService $monitoringLoopService
-     * @param UnitServiceChain $unitServiceChain
+     * @param Request       $request
+     * @param StatusService $statusService
      *
      * @return JsonResponse
-     * @throws \Exception
      */
-    public function overview(
-        Request $request,
-        MonitoringLoopService $monitoringLoopService,
-        UnitServiceChain $unitServiceChain
-    ): JsonResponse {
+    public function overview(Request $request, StatusService $statusService): JsonResponse
+    {
         if ($request->get('key') !== $this->apiKey) {
             return $this->json(
                 ['error' => 'unauthorized', 'status_code' => Response::HTTP_UNAUTHORIZED],
                 Response::HTTP_UNAUTHORIZED
             );
         }
-
         $output = [];
-        $output['status'] = ($monitoringLoopService->isLoopProcessRunning()) ? 'running' : 'stopped';
-        $output['available_units'] = $unitServiceChain->getIdentifier();
-        $output['triggered_units'] = $monitoringLoopService->getAllTriggeredUnits();
-        $output['count_units'] = $monitoringLoopService->countAllUnits();
+        $output['status'] = ($statusService->isLoopProcessRunning()) ? 'running' : 'stopped';
+        $output['available_units'] = $statusService->getAvailableUnits();
+        $output['triggered_units'] = $statusService->getAllTriggeredUnits();
+        $output['count_units'] = $statusService->countAllUnits();
 
         return $this->json($output);
-
     }
 }
