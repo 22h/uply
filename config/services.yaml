@@ -69,6 +69,11 @@ services:
         arguments:
             - App\Entity\Unit\ContentHash
 
+    App\Repository\TokenRepository:
+        factory: ['@doctrine.orm.default_entity_manager', getRepository]
+        arguments:
+            - App\Entity\Token
+
     App\Scrutinizer\Services\:
         resource: '../src/Scrutinizer/Services/*'
         tags:

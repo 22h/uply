@@ -6,7 +6,7 @@ use App\Entity\Job;
 use Doctrine\DBAL\Types\Type;
 
 /**
- * EventRepository
+ * JobRepository
  *
  * @author Magnus Reiß <info@magnus-reiss.de>
  */
