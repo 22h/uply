@@ -38,14 +38,14 @@ trait UnitTrait
      *
      * @ORM\Column(type="integer")
      */
-    private $idleTime = self::DEFAULT_IDLE_TIME;
+    private $idleTime = AbstractUnit::DEFAULT_IDLE_TIME;
 
     /**
      * @var int
      *
      * @ORM\Column(type="integer")
      */
-    private $triggeredIdleTime = self::DEFAULT_IDLE_TIME;
+    private $triggeredIdleTime = AbstractUnit::DEFAULT_IDLE_TIME;
 
     /**
      * @var bool

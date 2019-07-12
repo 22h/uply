@@ -2,8 +2,6 @@
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
     locale: 'de'
-    router.request_context.host: '%env(ROUTER_REQUEST_HOST)%'
-    router.request_context.scheme: '%env(ROUTER_REQUEST_SCHEME)%'
 
 services:
     _defaults:
@@ -12,6 +10,7 @@ services:
         public: false
         bind:
             $defaultDiscordWebHook: '%env(DISCORD_WEBHOOK)%'
+            $defaultSlackWebHook: '%env(SLACK_WEBHOOK)%'
             $projectDir: '%kernel.project_dir%'
             $apiKey: '%env(UPLY_API_KEY)%'
             $heartbeatFile: '%kernel.project_dir%/data/heartbeat'
@@ -43,6 +42,10 @@ services:
             - [setLogger, ['@monolog.logger.loop']]
 
     App\Notification\Event\Listener\SendDiscordNotificationListener:
+        tags:
+            - { name: kernel.event_listener, event: uply.notification.send, method: onNotificationSend }
+
+    App\Notification\Event\Listener\SendSlackNotificationListener:
         tags:
             - { name: kernel.event_listener, event: uply.notification.send, method: onNotificationSend }
 

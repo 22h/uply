@@ -1,11 +1,9 @@
 <?php
 
-namespace App\Notification\Service\Discord;
+namespace App\Notification\Service\Slack;
 
 use App\Entity\Unit\UnitInterface;
 use App\Notification\NotificationData;
-use App\Notification\Service\Discord\WebHook\Embed;
-use App\Notification\Service\Discord\WebHook\WebHook;
 
 /**
  * WebHookService
@@ -22,11 +20,11 @@ class WebHookService
     /**
      * WebHookService constructor.
      *
-     * @param string $defaultDiscordWebHook
+     * @param string $defaultSlackWebHook
      */
-    public function __construct(?string $defaultDiscordWebHook)
+    public function __construct(?string $defaultSlackWebHook)
     {
-        $this->webHookUrl = $defaultDiscordWebHook;
+        $this->webHookUrl = $defaultSlackWebHook;
     }
 
     /**
@@ -34,6 +32,7 @@ class WebHookService
      * @param UnitInterface    $unit
      *
      * @return bool
+     * @throws \Exception
      */
     public function sendByMonitoringParameterBag(NotificationData $notificationData, UnitInterface $unit): bool
     {
@@ -41,44 +40,50 @@ class WebHookService
             return false;
         }
 
-        $embed = (new Embed())
-            ->setTitle($unit->getDomain())
-            ->setDescription($notificationData->getDescription())
-            ->setFooter((new Embed\Footer())->setText(date('d.m.Y. - H:i:s')));
-
+        $color = '';
         if ($notificationData->isSuccess()) {
-            $embed->setColor('1E824C');
+            $color = '1E824C';
         } elseif ($notificationData->isWarning()) {
-            $embed->setColor('F7CA18');
+            $color = 'F7CA18';
         } elseif ($notificationData->isDanger()) {
-            $embed->setColor('CF000F');
+            $color = 'CF000F';
         } elseif ($notificationData->isError()) {
-            $embed->setColor('663399');
+            $color = '663399';
         }
 
-        return $this->send((new WebHook())->addEmbed($embed));
+        $data = [
+            'attachments' => [
+                [
+                    'title'  => $unit->getDomain(),
+                    'footer' => date('d.m.Y. - H:i:s'),
+                    'color'  => $color,
+                    'text'   => $notificationData->getDescription(),
+                ],
+            ],
+        ];
+
+        return $this->send($data);
     }
 
     /**
-     * @param WebHook $webHook
+     * @param array $data
      *
      * @return bool
      * @throws \Exception
      */
-    private function send(WebHook $webHook): bool
+    private function send(array $data): bool
     {
-        $data_string = json_encode($webHook->returnArray());
+        $data_string = json_encode($data);
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, $this->webHookUrl);
         curl_setopt($curl, CURLOPT_POST, 1);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($curl, CURLOPT_HEADER, true);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $data_string);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, ['payload' => $data_string]);
         $output = curl_exec($curl);
-        if (curl_getinfo($curl, CURLINFO_HTTP_CODE) != 204) {
+        if (curl_getinfo($curl, CURLINFO_HTTP_CODE) != 200) {
             throw new \Exception($output);
         }
         curl_close($curl);

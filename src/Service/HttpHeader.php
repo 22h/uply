@@ -20,11 +20,6 @@ class HttpHeader
     protected $userAgent = 'Uplybot/0.2 (+http://github.com)';
 
     /**
-     * @var string
-     */
-    protected $method = 'GET';
-
-    /**
      * @var bool
      */
     protected $disableSSLCheck = true;
@@ -44,18 +39,25 @@ class HttpHeader
                 'verify_peer_name' => false,
             ];
         }
-        $options['http'] = [
-            'method'  => $this->method,
-            'timeout' => $this->timeout,
-        ];
-        if (!is_null($this->userAgent)) {
-            $options['http']['user_agent'] = $this->userAgent;
-        }
-        stream_context_set_default($options);
+
         $statusCode = null;
-        $headers = @get_headers($url);
-        if (is_array($headers) && array_key_exists(0, $headers)) {
-            $statusCode = (int)substr($headers[0], 9, 3);
+
+        try {
+            $curl = curl_init();
+            curl_setopt_array(
+                $curl,
+                [
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_URL            => $url,
+                    CURLOPT_TIMEOUT        => $this->timeout,
+                    CURLOPT_USERAGENT      => $this->userAgent,
+                ]
+            );
+            curl_exec($curl);
+            $statusCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+            curl_close($curl);
+        } catch (\Exception $exception) {
+            // do nothing
         }
 
         if (is_null($statusCode)) {
@@ -85,18 +87,6 @@ class HttpHeader
     public function setUserAgent(string $userAgent): HttpHeader
     {
         $this->userAgent = $userAgent;
-
-        return $this;
-    }
-
-    /**
-     * @param string $method
-     *
-     * @return HttpHeader
-     */
-    public function setMethod(string $method): HttpHeader
-    {
-        $this->method = $method;
 
         return $this;
     }
