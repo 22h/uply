@@ -11,6 +11,7 @@ abstract class AbstractUnit implements UnitInterface
 {
 
     const DEFAULT_IDLE_TIME = 5;
+    const DEFAULT_TRIGGERED_IDLE_TIME = 1;
 
     /**
      * @return null|string

@@ -8,6 +8,7 @@ use App\Notification\NotificationData;
 use App\Repository\Unit\StatusCodeRepository;
 use App\Scrutinizer\AbstractScrutinizer;
 use App\Service\HttpHeader;
+use Exception;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
@@ -45,11 +46,12 @@ class StatusCodeScrutinizer extends AbstractScrutinizer
 
     /**
      * @inheritDoc
+     * @throws Exception
      */
     public function scrutinize(UnitInterface $unit): NotificationData
     {
         if (!($unit instanceof StatusCode)) {
-            throw new \Exception('invalid unit');
+            throw new Exception('invalid unit');
         }
         $this->logger->info('status code scrutinizer');
 
@@ -88,7 +90,7 @@ class StatusCodeScrutinizer extends AbstractScrutinizer
     {
         try {
             $actualStatusCode = $this->httpHeader->requestStatusCode($url);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             return $this->notificationDataFactory->createErrorNotificationData(
                 'status_code.error',
                 ['%url%' => $url, '%exception%' => $exception->getMessage()]

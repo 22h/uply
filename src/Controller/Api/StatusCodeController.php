@@ -8,22 +8,22 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * DefaultController
+ * JobController
  *
- * @Route("/api/default")
+ * @Route("/api/status-code")
  *
  * @author Magnus Reiß <info@magnus-reiss.de>
  */
-class DefaultController extends AbstractController
+class StatusCodeController extends AbstractController
 {
 
     /**
-     * @Route("/", name="api_default_overview")
+     * @Route("", name="api_status_code_create", methods={"POST"})
      *
      * @return Response
      * @throws \Exception
      */
-    public function overview(): Response
+    public function create(): Response
     {
         return new JsonResponse(['test' => '123'], Response::HTTP_OK);
     }

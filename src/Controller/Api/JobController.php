@@ -8,9 +8,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * DefaultController
+ * JobController
  *
- * @Route("/api/job/")
+ * @Route("/api/job")
  *
  * @author Magnus Reiß <info@magnus-reiss.de>
  */
@@ -18,7 +18,7 @@ class JobController extends AbstractController
 {
 
     /**
-     * @Route("/", name="api_default_overview")
+     * @Route("", name="api_default_overview")
      *
      * @return Response
      * @throws \Exception

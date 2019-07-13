@@ -45,7 +45,7 @@ trait UnitTrait
      *
      * @ORM\Column(type="integer")
      */
-    private $triggeredIdleTime = AbstractUnit::DEFAULT_IDLE_TIME;
+    private $triggeredIdleTime = AbstractUnit::DEFAULT_TRIGGERED_IDLE_TIME;
 
     /**
      * @var bool
