@@ -14,6 +14,8 @@ use Symfony\Component\Routing\Annotation\Route;
  *
  * @Route("/status")
  *
+ * @deprecated do not use this route anymore, use /src/Controller/Api/StatusController with token
+ *
  * @author Magnus Reiß <info@magnus-reiss.de>
  */
 class StatusController extends AbstractController

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Uply</title>
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            background: #eeeeee;
+            font-family: Roboto, Verdana, sans-serif;
+            color: #000000;
+            font-size: 14px;
+            padding-top: 8rem;
+        }
+
+        #top {
+            width: 100%;
+            height: 200px;
+            background: #4b6584;
+            position: absolute;
+            top: 0;
+        }
+
+        .center {
+            height: 100%;
+            margin: 0 auto;
+            width: 100%;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .center img {
+            position: absolute;
+            bottom: 0;
+            left: 20px;
+        }
+
+        .card {
+            background: #ffffff;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+            margin-top: 15px;
+            margin-bottom: 15px;
+            border-radius: 0;
+            border: 0;
+            padding: 10px;
+        }
+
+        a {
+            color: #4b6584;
+            text-decoration: none;
+        }
+
+        a:focus, a:hover {
+            color: #4b6584;
+            text-decoration: underline;
+        }
+
+        code {
+            font-size: 0.75rem;
+            background: #dedede;
+            padding: 0.12rem;
+            border-radius: 0.25rem;
+        }
+    </style>
+</head>
+<body>
+<div id="top"></div>
+<div class="center card">
+    <p><b>Uply - Uptime Dienst</b></p>
+    <p>Uply überprüft die Erreichbarkeit von Webseiten, sowie die Laufzeit von Zerfitikaten und mehr.</p>
+</div>
+<div class="center card">
+    <p><b>Useragent</b></p>
+    <p>Falls Sie aktivitäten auf Ihren Servern durch den folgenden Useragent entdecken, die nicht erwünscht sind, dann melden Sie sich bei uns.<br />
+        <code>{{ useragent }}</code></p>
+</div>
+<div class="center card">
+    <a href="https://github.com/22h/uply">Github</a>
+</div>
+</body>
+</html>

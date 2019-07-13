@@ -2,12 +2,13 @@
 
 namespace App\Controller;
 
+use App\Service\UserAgentService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * StatusController
+ * DefaultController
  *
  * @Route("/")
  *
@@ -19,11 +20,12 @@ class DefaultController extends AbstractController
     /**
      * @Route("/", name="default")
      *
+     * @param UserAgentService $userAgentService
+     *
      * @return Response
-     * @throws \Exception
      */
-    public function overview(): Response
+    public function overview(UserAgentService $userAgentService): Response
     {
-        return new Response('ups ;-)', Response::HTTP_NOT_FOUND);
+        return $this->render('index.html.twig', ['useragent' => $userAgentService->getUserAgent()]);
     }
 }

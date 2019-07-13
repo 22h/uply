@@ -9,6 +9,7 @@ services:
         autoconfigure: false
         public: false
         bind:
+            $uplyVersion: '0.3'
             $defaultDiscordWebHook: '%env(DISCORD_WEBHOOK)%'
             $defaultSlackWebHook: '%env(SLACK_WEBHOOK)%'
             $projectDir: '%kernel.project_dir%'
