@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Service\StatusService;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -42,6 +43,7 @@ class StatusController extends AbstractController
      * @param StatusService $statusService
      *
      * @return JsonResponse
+     * @throws Exception
      */
     public function overview(Request $request, StatusService $statusService): JsonResponse
     {

@@ -6,6 +6,8 @@ use App\Entity\Unit\UnitInterface;
 use App\Notification\NotificationData;
 use App\Notification\Service\Discord\WebHook\Embed;
 use App\Notification\Service\Discord\WebHook\WebHook;
+use App\Service\GuzzleClientFactory;
+use GuzzleHttp\RequestOptions;
 
 /**
  * WebHookService
@@ -18,15 +20,21 @@ class WebHookService
      * @var string|null
      */
     private $webHookUrl = null;
+    /**
+     * @var GuzzleClientFactory
+     */
+    private $guzzleClientFactory;
 
     /**
      * WebHookService constructor.
      *
-     * @param string $defaultDiscordWebHook
+     * @param GuzzleClientFactory $guzzleClientFactory
+     * @param string              $defaultDiscordWebHook
      */
-    public function __construct(?string $defaultDiscordWebHook)
+    public function __construct(GuzzleClientFactory $guzzleClientFactory, string $defaultDiscordWebHook)
     {
         $this->webHookUrl = $defaultDiscordWebHook;
+        $this->guzzleClientFactory = $guzzleClientFactory;
     }
 
     /**
@@ -67,21 +75,12 @@ class WebHookService
      */
     private function send(WebHook $webHook): bool
     {
-        $data_string = json_encode($webHook->returnArray());
-        $curl = curl_init();
-        curl_setopt($curl, CURLOPT_URL, $this->webHookUrl);
-        curl_setopt($curl, CURLOPT_POST, 1);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($curl, CURLOPT_HEADER, true);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $data_string);
-        $output = curl_exec($curl);
-        if (curl_getinfo($curl, CURLINFO_HTTP_CODE) != 204) {
-            throw new \Exception($output);
+        $client = $this->guzzleClientFactory->getNewGuzzleClient();
+        $response = $client->post($this->webHookUrl, [RequestOptions::JSON => $webHook->returnArray()]);
+
+        if ($response->getStatusCode() != 204) {
+            throw new \Exception($response->getBody()->getContents());
         }
-        curl_close($curl);
 
         return true;
     }

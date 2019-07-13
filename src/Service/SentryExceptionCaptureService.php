@@ -33,10 +33,8 @@ class SentryExceptionCaptureService
      *
      * @return void
      */
-    public function forwardExceptionToSentry(
-        \Exception $exception,
-        array $extraContent = []
-    ): void {
+    public function forwardExceptionToSentry(\Exception $exception, array $extraContent = []): void
+    {
         if (is_array($extraContent) && count($extraContent) > 0) {
             $this->sentryClient->extra_context($extraContent);
         }

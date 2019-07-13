@@ -4,6 +4,8 @@ namespace App\Notification\Service\Slack;
 
 use App\Entity\Unit\UnitInterface;
 use App\Notification\NotificationData;
+use App\Service\GuzzleClientFactory;
+use GuzzleHttp\RequestOptions;
 
 /**
  * WebHookService
@@ -16,15 +18,22 @@ class WebHookService
      * @var string|null
      */
     private $webHookUrl = null;
+    
+    /**
+     * @var GuzzleClientFactory
+     */
+    private $guzzleClientFactory;
 
     /**
      * WebHookService constructor.
      *
-     * @param string $defaultSlackWebHook
+     * @param GuzzleClientFactory $guzzleClientFactory
+     * @param string              $defaultSlackWebHook
      */
-    public function __construct(?string $defaultSlackWebHook)
+    public function __construct(GuzzleClientFactory $guzzleClientFactory, string $defaultSlackWebHook)
     {
         $this->webHookUrl = $defaultSlackWebHook;
+        $this->guzzleClientFactory = $guzzleClientFactory;
     }
 
     /**
@@ -73,20 +82,12 @@ class WebHookService
      */
     private function send(array $data): bool
     {
-        $data_string = json_encode($data);
-        $curl = curl_init();
-        curl_setopt($curl, CURLOPT_URL, $this->webHookUrl);
-        curl_setopt($curl, CURLOPT_POST, 1);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($curl, CURLOPT_HEADER, true);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, ['payload' => $data_string]);
-        $output = curl_exec($curl);
-        if (curl_getinfo($curl, CURLINFO_HTTP_CODE) != 200) {
-            throw new \Exception($output);
+        $client = $this->guzzleClientFactory->getNewGuzzleClient();
+        $response = $client->post($this->webHookUrl, [RequestOptions::JSON => $data]);
+
+        if ($response->getStatusCode() != 200) {
+            throw new \Exception($response->getBody()->getContents());
         }
-        curl_close($curl);
 
         return true;
     }

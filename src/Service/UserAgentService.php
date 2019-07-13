@@ -59,7 +59,7 @@ class UserAgentService
      */
     private function replaceUrl(string $useragent): string
     {
-        return str_replace(self::PLACEHOLDER_VERSION, $this->url, $useragent);
+        return str_replace(self::PLACEHOLDER_URL, $this->url, $useragent);
     }
 
     /**

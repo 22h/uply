@@ -11,7 +11,7 @@ a simple service for checking online times and ssl certificates
 Add new entry in `supervisord.conf` (default: `/etc/supervisor/supervisord.conf`) 
 ```
 [program:uply_job_loop]
-command=php /var/www/uply.dev/bin/console job:loop
+command=php /project/path/bin/console job:loop
 ```
 ### install supervisord 
 ```

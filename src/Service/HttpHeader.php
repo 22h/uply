@@ -2,6 +2,9 @@
 
 namespace App\Service;
 
+
+use GuzzleHttp\RequestOptions;
+
 /**
  * StatusCode
  *
@@ -10,19 +13,17 @@ namespace App\Service;
 class HttpHeader
 {
     /**
-     * @var int
+     * @var GuzzleClientFactory
      */
-    protected $timeout = 10;
+    private $guzzleClientFactory;
 
     /**
-     * @var string|null
+     * @param GuzzleClientFactory $guzzleClientFactory
      */
-    protected $userAgent = 'Uplybot/0.2 (+http://github.com)';
-
-    /**
-     * @var bool
-     */
-    protected $disableSSLCheck = true;
+    public function __construct(GuzzleClientFactory $guzzleClientFactory)
+    {
+        $this->guzzleClientFactory = $guzzleClientFactory;
+    }
 
     /**
      * @param string $url
@@ -32,30 +33,11 @@ class HttpHeader
      */
     public function requestStatusCode(string $url): int
     {
-        $options = [];
-        if ($this->disableSSLCheck) {
-            $options['ssl'] = [
-                'verify_peer'      => false,
-                'verify_peer_name' => false,
-            ];
-        }
-
+        $client = $this->guzzleClientFactory->getNewGuzzleClient();
         $statusCode = null;
-
         try {
-            $curl = curl_init();
-            curl_setopt_array(
-                $curl,
-                [
-                    CURLOPT_RETURNTRANSFER => true,
-                    CURLOPT_URL            => $url,
-                    CURLOPT_TIMEOUT        => $this->timeout,
-                    CURLOPT_USERAGENT      => $this->userAgent,
-                ]
-            );
-            curl_exec($curl);
-            $statusCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-            curl_close($curl);
+            $response = $client->get($url, [RequestOptions::CONNECT_TIMEOUT => 10]);
+            $statusCode = $response->getStatusCode();
         } catch (\Exception $exception) {
             // do nothing
         }
@@ -65,41 +47,5 @@ class HttpHeader
         }
 
         return $statusCode;
-    }
-
-    /**
-     * @param int $timeout
-     *
-     * @return HttpHeader
-     */
-    public function setTimeout(int $timeout): HttpHeader
-    {
-        $this->timeout = $timeout;
-
-        return $this;
-    }
-
-    /**
-     * @param string $userAgent
-     *
-     * @return HttpHeader
-     */
-    public function setUserAgent(string $userAgent): HttpHeader
-    {
-        $this->userAgent = $userAgent;
-
-        return $this;
-    }
-
-    /**
-     * @param bool $disableSSLCheck
-     *
-     * @return HttpHeader
-     */
-    public function setDisableSSLCheck(bool $disableSSLCheck): HttpHeader
-    {
-        $this->disableSSLCheck = $disableSSLCheck;
-
-        return $this;
     }
 }
